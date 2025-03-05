@@ -6,7 +6,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\Master\MasterController;
 
 Route::get('/', function () {
-    return Inertia::render('Welcome');
+    return redirect()->route('dashboard');
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
