@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use App\Models\User;
 
 class EmailVerificationNotificationController extends Controller
 {
@@ -20,5 +21,21 @@ class EmailVerificationNotificationController extends Controller
         $request->user()->sendEmailVerificationNotification();
 
         return back()->with('status', 'verification-link-sent');
+    }
+
+    /**
+     * Send a new email verification notification using the user ID. Return JSON response.
+     */
+    public function storeCustom(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+
+        if ($user->hasVerifiedEmail()) {
+            return response()->json(['message' => 'Email sudah terverifikasi'], 200);
+        }
+
+        $user->sendEmailVerificationNotification();
+
+        return response()->json(['message' => 'Email Verifikasi Terkirim'], 201);
     }
 }
