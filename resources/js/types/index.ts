@@ -34,7 +34,7 @@ export interface User {
     updated_at: string;
 }
 
-export interface Pagination<T> {
+export interface PaginationData<T> {
     current_page: number;
     data: T[];
     first_page_url: string;
@@ -49,6 +49,5 @@ export interface Pagination<T> {
     to: number;
     total: number;
 }
-
 
 export type BreadcrumbItemType = BreadcrumbItem;

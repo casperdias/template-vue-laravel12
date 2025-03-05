@@ -15,8 +15,12 @@ class UserDataController extends Controller
      */
     public function index()
     {
-        $users = User::select('id', 'name', 'email', 'created_at', 'email_verified_at')->paginate(10);
-        return Inertia::render('master/UserData', ['users' => $users]);
+        $page = request()->input('page', 1);
+        $per_page = request()->input('per_page', 1);
+        $users = User::select('id', 'name', 'email', 'created_at', 'email_verified_at')->paginate($per_page, ['*'], 'page', $page);
+        return Inertia::render('master/UserData', [
+            'users' => $users,
+        ]);
     }
 
     /**
