@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import axios from 'axios'
 import { User, PaginationData, type BreadcrumbItem } from '@/types'
-import { Head, Link, useForm, router } from '@inertiajs/vue3'
+import { Head, useForm, router } from '@inertiajs/vue3'
 import AppLayout from '@/layouts/AppLayout.vue'
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button'
@@ -88,20 +88,21 @@ const form = useForm({
     password: '',
 });
 
-const dialogOpen = ref(false);
+const addDialog = ref(false);
 
 const addUser = (users: PaginationData<User>) => {
-    form.post(route('register', { page: users.current_page }), {
+    form.post(route('users.store', { page: users.current_page }), {
         preserveState: true,
         preserveScroll: true,
         onSuccess: () => {
-            dialogOpen.value = false;
+            addDialog.value = false;
             form.reset();
         },
     });
 };
 
 const deleteDialogOpen = ref(false);
+const editDialogOpen = ref(false);
 const selectedUser = ref<User | null>(null);
 
 const openDeleteDialog = (user: User) => {
@@ -125,6 +126,31 @@ const deleteUser = (users: PaginationData<User>) => {
         });
     }
 };
+
+const openEditDialog = (user: User) => {
+    selectedUser.value = user;
+    form.name = user.name;
+    form.email = user.email;
+    editDialogOpen.value = true;
+};
+
+const editUser = (users: PaginationData<User>) => {
+    if (selectedUser.value) {
+        form.put(route('users.update', { user: selectedUser.value?.id, page: users.current_page }), {
+            preserveState: true,
+            preserveScroll: true,
+            onSuccess: () => {
+                editDialogOpen.value = false;
+                selectedUser.value = null;
+                form.reset();
+                toast({
+                    title: 'User updated',
+                    description: 'User has been updated successfully',
+                });
+            },
+        });
+    }
+};
 </script>
 
 <template>
@@ -132,7 +158,7 @@ const deleteUser = (users: PaginationData<User>) => {
     <Head title="User Data" />
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-            <Dialog v-model:open="dialogOpen">
+            <Dialog v-model:open="addDialog">
                 <DialogTrigger as-child>
                 <Button variant="outline">
                     Tambah User
@@ -203,9 +229,7 @@ const deleteUser = (users: PaginationData<User>) => {
                             </form>
                         </TableCell>
                         <TableCell class="flex gap-2">
-                            <Link :href="route('users.edit', { user: user.id })">
-                                <Button>Edit</Button>
-                            </Link>
+                            <Button @click="openEditDialog(user)">Edit</Button>
                             <Button @click="openDeleteDialog(user)">Delete</Button>
                         </TableCell>
                     </TableRow>
@@ -258,6 +282,38 @@ const deleteUser = (users: PaginationData<User>) => {
                 <Button variant="secondary">Cancel</Button>
                 </DialogClose>
             </DialogFooter>
+        </DialogContent>
+    </Dialog>
+
+    <!-- Edit Dialog -->
+    <Dialog v-model:open="editDialogOpen">
+        <DialogContent class="bg-white dark:bg-gray-900 shadow-lg rounded-lg">
+            <DialogHeader>
+                <DialogTitle>Edit User</DialogTitle>
+                <DialogDescription>
+                Edit {{ selectedUser?.name }}
+                </DialogDescription>
+            </DialogHeader>
+            <!-- Edit name and email -->
+            <form @submit.prevent="editUser(users)" class="space-y-4">
+                <div class="grid gap-2">
+                    <Label for="name">Name</Label>
+                    <Input id="name" type="text" required autofocus :tabindex="1" autocomplete="name" v-model="form.name" placeholder="Full name" />
+                    <InputError :message="form.errors.name" />
+                </div>
+
+                <div class="grid gap-2">
+                    <Label for="email">Email address</Label>
+                    <Input id="email" type="email" required :tabindex="2" autocomplete="email" v-model="form.email" placeholder="Email" />
+                    <InputError :message="form.errors.email" />
+                </div>
+                <DialogFooter>
+                    <DialogClose as-child>
+                        <Button variant="secondary">Cancel</Button>
+                    </DialogClose>
+                    <Button type="submit">Ubah</Button>
+                </DialogFooter>
+            </form>
         </DialogContent>
     </Dialog>
 </template>

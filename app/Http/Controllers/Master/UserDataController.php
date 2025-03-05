@@ -5,8 +5,11 @@ namespace App\Http\Controllers\Master;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Auth\Events\Registered;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules;
 
 class UserDataController extends Controller
 {
@@ -36,7 +39,21 @@ class UserDataController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
+            'password' => ['required', Rules\Password::defaults()],
+        ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
+
+        event(new Registered($user));
+
+        return to_route('users.index', ['page' => request('page', 1)]);
     }
 
     /**
@@ -60,7 +77,14 @@ class UserDataController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class.',email,'.$user->id,
+        ]);
+
+        $user->update($request->only('name', 'email'));
+
+        return to_route('users.index', ['page' => request('page', 1)]);
     }
 
     /**
@@ -69,7 +93,7 @@ class UserDataController extends Controller
     public function destroy(User $user)
     {
         $user->delete();
-        
+
         return to_route('users.index', ['page' => request('page', 1)]);
     }
 }
