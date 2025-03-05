@@ -44,6 +44,6 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
-        return to_route('users.index');
+        return to_route('users.index', ['page' => request('page', 1)]);
     }
 }

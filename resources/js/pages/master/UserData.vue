@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import axios from 'axios'
 import { User, PaginationData, type BreadcrumbItem } from '@/types'
-import { Head, Link, useForm } from '@inertiajs/vue3'
+import { Head, Link, useForm, router } from '@inertiajs/vue3'
 import AppLayout from '@/layouts/AppLayout.vue'
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button'
@@ -60,6 +60,13 @@ interface Props {
 
 defineProps<Props>()
 
+const changePage = (newPage: number) => {
+    router.get(route('users.index'), { page: newPage }, {
+        preserveState: true,
+        preserveScroll: true,
+    });
+};
+
 const sendNotification = async (userId: number) => {
     try {
         const response = await axios.post(route('verification.send.id', { user: userId }))
@@ -83,12 +90,40 @@ const form = useForm({
 
 const dialogOpen = ref(false);
 
-const addUser = () => {
-    form.post(route('register'), {
+const addUser = (users: PaginationData<User>) => {
+    form.post(route('register', { page: users.current_page }), {
+        preserveState: true,
+        preserveScroll: true,
         onSuccess: () => {
             dialogOpen.value = false;
+            form.reset();
         },
     });
+};
+
+const deleteDialogOpen = ref(false);
+const selectedUser = ref<User | null>(null);
+
+const openDeleteDialog = (user: User) => {
+    selectedUser.value = user;
+    deleteDialogOpen.value = true;
+};
+
+const deleteUser = (users: PaginationData<User>) => {
+    if (selectedUser.value) {
+        router.delete(route('users.destroy', { user: selectedUser.value?.id, page: users.current_page }), {
+            preserveState: true,
+            preserveScroll: true,
+            onSuccess: () => {
+                deleteDialogOpen.value = false;
+                selectedUser.value = null;
+                toast({
+                    title: 'User deleted',
+                    description: 'User has been deleted successfully',
+                });
+            },
+        });
+    }
 };
 </script>
 
@@ -97,7 +132,6 @@ const addUser = () => {
     <Head title="User Data" />
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-            {{ users }}
             <Dialog v-model:open="dialogOpen">
                 <DialogTrigger as-child>
                 <Button variant="outline">
@@ -105,11 +139,11 @@ const addUser = () => {
                 </Button>
                 </DialogTrigger>
                 <DialogContent class="sm:max-w-[425px]">
-                    <form @submit.prevent="addUser" class="space-y-4">
+                    <form @submit.prevent="addUser(users)" class="space-y-4">
                         <DialogHeader>
                             <DialogTitle>Tambah User</DialogTitle>
                             <DialogDescription>
-                            Masukkan Nama dan email
+                                Masukkan Nama dan email
                             </DialogDescription>
                         </DialogHeader>
                         <div class="grid gap-2">
@@ -172,31 +206,58 @@ const addUser = () => {
                             <Link :href="route('users.edit', { user: user.id })">
                                 <Button>Edit</Button>
                             </Link>
-                            <Link :href="route('users.destroy', { user: user.id })">
-                                <Button>Delete</Button>
-                            </Link>
+                            <Button @click="openDeleteDialog(user)">Delete</Button>
                         </TableCell>
                     </TableRow>
                 </TableBody>
             </Table>
-            <Pagination v-slot="{ page }" :items-per-page="users.per_page" :total="users.total" :sibling-count="1" show-edges :default-page="users.current_page">
+            <Pagination
+                v-slot="{ page }"
+                :items-per-page="users.per_page"
+                :total="users.total"
+                :sibling-count="1"
+                show-edges
+                :default-page="users.current_page"
+            >
                 <PaginationList v-slot="{ items }" class="flex items-center justify-center gap-1">
-                    <PaginationFirst />
-                    <PaginationPrev />
+                    <PaginationFirst @click="changePage(users.from)"/>
+                    <PaginationPrev @click="changePage(users.current_page - 1)"/>
 
                     <template v-for="(item, index) in items">
                         <PaginationListItem v-if="item.type === 'page'" :key="index" :value="item.value" as-child>
-                        <Button class="w-10 h-10 p-0" :variant="item.value === page ? 'default' : 'outline'">
-                            {{ item.value }}
-                        </Button>
+                            <Button
+                                class="w-10 h-10 p-0"
+                                :variant="item.value === page ? 'default' : 'outline'"
+                                @click="changePage(item.value)"
+                            >
+                                {{ item.value }}
+                            </Button>
                         </PaginationListItem>
                         <PaginationEllipsis v-else :key="item.type" :index="index" />
                     </template>
 
-                    <PaginationNext />
-                    <PaginationLast />
+                    <PaginationNext @click="changePage(users.current_page + 1)"/>
+                    <PaginationLast @click="changePage(users.last_page)"/>
                 </PaginationList>
             </Pagination>
         </div>
     </AppLayout>
+
+    <!-- Delete Dialog -->
+    <Dialog v-model:open="deleteDialogOpen">
+        <DialogContent class="bg-white dark:bg-gray-900 shadow-lg rounded-lg">
+            <DialogHeader>
+                <DialogTitle>Confirm Delete</DialogTitle>
+                <DialogDescription>
+                Are you sure you want to delete {{ selectedUser?.name }}?
+                </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+                <Button variant="destructive" @click="deleteUser(users)">Delete</Button>
+                <DialogClose as-child>
+                <Button variant="secondary">Cancel</Button>
+                </DialogClose>
+            </DialogFooter>
+        </DialogContent>
+    </Dialog>
 </template>
