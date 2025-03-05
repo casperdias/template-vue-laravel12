@@ -1,9 +1,15 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import AppLayout from '@/layouts/AppLayout.vue'
-import InputError from '@/components/InputError.vue';
+import axios from 'axios'
 import { User, PaginationData, type BreadcrumbItem } from '@/types'
 import { Head, Link, useForm } from '@inertiajs/vue3'
+import AppLayout from '@/layouts/AppLayout.vue'
+import InputError from '@/components/InputError.vue';
+import { Button } from '@/components/ui/button'
+import { useToast } from '@/components/ui/toast/use-toast'
+import Toaster from '@/components/ui/toast/Toaster.vue'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
 import {
     Table,
     TableBody,
@@ -13,12 +19,6 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table'
-import { Button } from '@/components/ui/button'
-import { useToast } from '@/components/ui/toast/use-toast'
-import Toaster from '@/components/ui/toast/Toaster.vue'
-import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
-import axios from 'axios'
 import {
     Pagination,
     PaginationEllipsis,
@@ -38,6 +38,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog'
+
 import { LoaderCircle } from 'lucide-vue-next';
 
 const { toast } = useToast()
@@ -84,7 +85,7 @@ const dialogOpen = ref(false);
 
 const addUser = () => {
     form.post(route('register'), {
-        onFinish: () => {
+        onSuccess: () => {
             dialogOpen.value = false;
         },
     });
@@ -96,6 +97,7 @@ const addUser = () => {
     <Head title="User Data" />
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+            {{ users }}
             <Dialog v-model:open="dialogOpen">
                 <DialogTrigger as-child>
                 <Button variant="outline">
