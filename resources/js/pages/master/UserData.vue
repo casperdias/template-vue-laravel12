@@ -32,6 +32,7 @@ import {
 import {
     Dialog,
     DialogContent,
+    DialogClose,
     DialogDescription,
     DialogFooter,
     DialogHeader,
@@ -111,6 +112,7 @@ const openDeleteDialog = (user: User) => {
 };
 
 const deleteUser = (users: PaginationData<User>) => {
+    const userName = selectedUser.value?.name;
     if (selectedUser.value) {
         router.delete(route('users.destroy', { user: selectedUser.value?.id, page: users.current_page }), {
             preserveState: true,
@@ -120,7 +122,7 @@ const deleteUser = (users: PaginationData<User>) => {
                 selectedUser.value = null;
                 toast({
                     title: 'User deleted',
-                    description: 'User has been deleted successfully',
+                    description: 'User ' + userName + ' has been deleted successfully',
                 });
             },
         });
@@ -136,6 +138,7 @@ const openEditDialog = (user: User) => {
 
 const editUser = (users: PaginationData<User>) => {
     if (selectedUser.value) {
+        const userName = form.name;
         form.put(route('users.update', { user: selectedUser.value?.id, page: users.current_page }), {
             preserveState: true,
             preserveScroll: true,
@@ -145,9 +148,9 @@ const editUser = (users: PaginationData<User>) => {
                 form.reset();
                 toast({
                     title: 'User updated',
-                    description: 'User has been updated successfully',
+                    description: 'User ' + userName + ' has been updated successfully',
                 });
-            },
+            }
         });
     }
 };
