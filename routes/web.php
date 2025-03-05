@@ -5,6 +5,7 @@ use Inertia\Inertia;
 
 use App\Http\Controllers\Master\MasterController;
 use App\Http\Controllers\Master\UserDataController;
+use App\Http\Controllers\Auth\RegisteredUserController;
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
@@ -21,6 +22,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'users' => UserDataController::class,
         ]);
     });
+    Route::post('register', [RegisteredUserController::class, 'store'])->name('register');
 });
 
 require __DIR__.'/settings.php';

@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import AppLayout from '@/layouts/AppLayout.vue'
+import InputError from '@/components/InputError.vue';
 import { User, PaginationData, type BreadcrumbItem } from '@/types'
-import { Head, Link } from '@inertiajs/vue3'
+import { Head, Link, useForm } from '@inertiajs/vue3'
 import {
     Table,
     TableBody,
@@ -14,6 +16,8 @@ import {
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toast/use-toast'
 import Toaster from '@/components/ui/toast/Toaster.vue'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
 import axios from 'axios'
 import {
     Pagination,
@@ -25,6 +29,16 @@ import {
     PaginationNext,
     PaginationPrev,
 } from '@/components/ui/pagination'
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog'
+import { LoaderCircle } from 'lucide-vue-next';
 
 const { toast } = useToast()
 
@@ -59,6 +73,22 @@ const sendNotification = async (userId: number) => {
         })
     }
 }
+
+const form = useForm({
+    name: '',
+    email: '',
+    password: '',
+});
+
+const dialogOpen = ref(false);
+
+const addUser = () => {
+    form.post(route('register'), {
+        onFinish: () => {
+            dialogOpen.value = false;
+        },
+    });
+};
 </script>
 
 <template>
@@ -66,6 +96,54 @@ const sendNotification = async (userId: number) => {
     <Head title="User Data" />
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+            <Dialog v-model:open="dialogOpen">
+                <DialogTrigger as-child>
+                <Button variant="outline">
+                    Tambah User
+                </Button>
+                </DialogTrigger>
+                <DialogContent class="sm:max-w-[425px]">
+                    <form @submit.prevent="addUser" class="space-y-4">
+                        <DialogHeader>
+                            <DialogTitle>Tambah User</DialogTitle>
+                            <DialogDescription>
+                            Masukkan Nama dan email
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div class="grid gap-2">
+                            <Label for="name">Name</Label>
+                            <Input id="name" type="text" required autofocus :tabindex="1" autocomplete="name" v-model="form.name" placeholder="Full name" />
+                            <InputError :message="form.errors.name" />
+                        </div>
+
+                        <div class="grid gap-2">
+                            <Label for="email">Email address</Label>
+                            <Input id="email" type="email" required :tabindex="2" autocomplete="email" v-model="form.email" placeholder="email@example.com" />
+                            <InputError :message="form.errors.email" />
+                        </div>
+
+                        <div class="grid gap-2">
+                            <Label for="password">Password</Label>
+                            <Input
+                                id="password"
+                                type="password"
+                                required
+                                :tabindex="3"
+                                autocomplete="new-password"
+                                v-model="form.password"
+                                placeholder="Password"
+                            />
+                            <InputError :message="form.errors.password" />
+                        </div>
+                        <DialogFooter>
+                            <Button type="submit" class="mt-2 w-full" tabindex="5" :disabled="form.processing">
+                                <LoaderCircle v-if="form.processing" class="h-4 w-4 animate-spin" />
+                                Create account
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
             <Table>
                 <TableCaption>Data User Aplikasi</TableCaption>
                 <TableHeader>
