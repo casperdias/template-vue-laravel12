@@ -25,7 +25,7 @@ const cards = [
         title: 'User',
         description: 'CRUD User dan Role User',
         icon: User,
-        url: '/master-data/user',
+        url: '/master-data/users',
         list: [
             'CRUD User',
             'Pengaturan Role User',
@@ -35,7 +35,7 @@ const cards = [
         title: 'Role',
         description: 'CRUD Role dan Permission Role',
         icon: UserCog,
-        url: '/master-data/role',
+        url: '/master-data/roles',
         list: [
             'CRUD Role',
             'Pengaturan Permission Role',
@@ -45,7 +45,7 @@ const cards = [
         title: 'Permission',
         description: 'CRUD Permission',
         icon: ShieldPlus,
-        url: '/master-data/permission',
+        url: '/master-data/permissions',
         list: [
             'CRUD Permission',
         ],
