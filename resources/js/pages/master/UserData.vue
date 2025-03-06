@@ -39,6 +39,15 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog'
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select'
 
 import { LoaderCircle } from 'lucide-vue-next';
 
@@ -56,10 +65,12 @@ const breadcrumbs: BreadcrumbItem[] = [
 ]
 
 interface Props {
-    users: PaginationData<User>
+    users: PaginationData<User>,
+    roles: Record<string, string>,
+    errors: any
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
 
 const changePage = (newPage: number) => {
     router.get(route('users.index'), { page: newPage }, {
@@ -87,6 +98,7 @@ const form = useForm({
     name: '',
     email: '',
     password: '',
+    role_id: '',
 });
 
 const addDialog = ref(false);
@@ -125,6 +137,14 @@ const deleteUser = (users: PaginationData<User>) => {
                     description: 'User ' + userName + ' has been deleted successfully',
                 });
             },
+            onError: (errors) => {
+                deleteDialogOpen.value = false;
+                selectedUser.value = null;
+                toast({
+                    title: 'Error',
+                    description: errors.id || 'An error occurred while deleting the user',
+                });
+            },
         });
     }
 };
@@ -133,6 +153,7 @@ const openEditDialog = (user: User) => {
     selectedUser.value = user;
     form.name = user.name;
     form.email = user.email;
+    form.role_id = String(user.role_id);
     editDialogOpen.value = true;
 };
 
@@ -187,6 +208,31 @@ const editUser = (users: PaginationData<User>) => {
                             <InputError :message="form.errors.email" />
                         </div>
 
+
+
+                        <div class="grid gap-2">
+                            <Label for="role">Role</Label>
+                            <Select v-model="form.role_id" id="role" required :tabindex="4">
+                                <SelectTrigger>
+                                    <SelectValue v-if="form.role_id" :value="form.role_id">
+                                        {{ props.roles[form.role_id] }}
+                                    </SelectValue>
+                                    <SelectValue v-else>
+                                        Select Role
+                                    </SelectValue>
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectLabel>Roles</SelectLabel>
+                                        <SelectItem v-for="(role, id) in props.roles" :key="id" :value="id">
+                                            {{ role }}
+                                        </SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                            <InputError :message="form.errors.role_id" />
+                        </div>
+
                         <div class="grid gap-2">
                             <Label for="password">Password</Label>
                             <Input
@@ -215,7 +261,7 @@ const editUser = (users: PaginationData<User>) => {
                     <TableRow>
                         <TableHead>Nama</TableHead>
                         <TableHead>Email</TableHead>
-                        <TableHead>Tanggal Dibuat</TableHead>
+                        <TableHead>Role</TableHead>
                         <TableHead>Verifikasi Email</TableHead>
                         <TableHead>Action</TableHead>
                     </TableRow>
@@ -224,7 +270,7 @@ const editUser = (users: PaginationData<User>) => {
                     <TableRow v-for="user in users.data" :key="user.id">
                         <TableCell>{{ user.name }}</TableCell>
                         <TableCell>{{ user.email }}</TableCell>
-                        <TableCell>{{ user.created_at }}</TableCell>
+                        <TableCell>{{ user.role?.display_name }}</TableCell>
                         <TableCell v-if="user.email_verified_at">{{ user.email_verified_at }}</TableCell>
                         <TableCell v-else>
                             <form @submit.prevent="sendNotification(user.id)">
@@ -309,6 +355,29 @@ const editUser = (users: PaginationData<User>) => {
                     <Label for="email">Email address</Label>
                     <Input id="email" type="email" required :tabindex="2" autocomplete="email" v-model="form.email" placeholder="Email" />
                     <InputError :message="form.errors.email" />
+                </div>
+
+                <div class="grid gap-2">
+                    <Label for="role">Role</Label>
+                    <Select v-model="form.role_id" id="role" required :tabindex="4">
+                        <SelectTrigger>
+                            <SelectValue v-if="form.role_id" :value="form.role_id">
+                                {{ props.roles[form.role_id] }}
+                            </SelectValue>
+                            <SelectValue v-else>
+                                Select Role
+                            </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectGroup>
+                                <SelectLabel>Roles</SelectLabel>
+                                <SelectItem v-for="(role, id) in props.roles" :key="id" :value="id">
+                                    {{ role }}
+                                </SelectItem>
+                            </SelectGroup>
+                        </SelectContent>
+                    </Select>
+                    <InputError :message="form.errors.role_id" />
                 </div>
                 <DialogFooter>
                     <DialogClose as-child>

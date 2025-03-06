@@ -3,13 +3,15 @@
 namespace App\Http\Controllers\Master;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Registered;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
+
+use App\Models\User;
+use App\Models\Role;
 
 class UserDataController extends Controller
 {
@@ -20,9 +22,13 @@ class UserDataController extends Controller
     {
         $page = request()->input('page', 1);
         $per_page = request()->input('per_page', 5);
-        $users = User::select('id', 'name', 'email', 'created_at', 'email_verified_at')->paginate($per_page, ['*'], 'page', $page);
+        $users = User::with('role:id,display_name')
+                ->select('id', 'name', 'email', 'created_at', 'email_verified_at', 'role_id')
+                ->paginate($per_page, ['*'], 'page', $page);
+        $roles = Role::all()->pluck('display_name', 'id');
         return Inertia::render('master/UserData', [
             'users' => $users,
+            'roles' => $roles,
         ]);
     }
 
@@ -42,6 +48,7 @@ class UserDataController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
+            'role_id' => 'required|exists:roles,id',
             'password' => ['required', Rules\Password::defaults()],
         ]);
 
@@ -49,6 +56,7 @@ class UserDataController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'role_id' => $request->role_id,
         ]);
 
         event(new Registered($user));
@@ -80,9 +88,10 @@ class UserDataController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class.',email,'.$user->id,
+            'role_id' => 'required|exists:roles,id',
         ]);
 
-        $user->update($request->only('name', 'email'));
+        $user->update($request->only('name', 'email', 'role_id'));
 
         return to_route('users.index', ['page' => request('page', 1)]);
     }
@@ -92,6 +101,10 @@ class UserDataController extends Controller
      */
     public function destroy(User $user)
     {
+        if ($user->id === 1) {
+            return back()->withErrors(['id' => 'Super Admin cannot be deleted']);
+        }
+
         $user->delete();
 
         return to_route('users.index', ['page' => request('page', 1)]);
