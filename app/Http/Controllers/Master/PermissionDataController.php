@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Permission;
 use Illuminate\Http\Request;
 
+use Inertia\Inertia;
+use Inertia\Response;
+
 class PermissionDataController extends Controller
 {
     /**
@@ -13,7 +16,14 @@ class PermissionDataController extends Controller
      */
     public function index()
     {
-        //
+        $page = request()->input('page', 1);
+        $per_page = request()->input('per_page', 5);
+        $permissions = Permission::select('id', 'name', 'display_name', 'description')
+            ->orderBy('id', 'asc')
+            ->paginate($per_page, ['*'], 'page', $page);
+        return Inertia::render('master/PermissionData', [
+            'permissions' => $permissions,
+        ]);
     }
 
     /**
@@ -29,7 +39,19 @@ class PermissionDataController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255|unique:' . Permission::class,
+            'display_name' => 'required|string|max:255',
+            'description' => 'required|string|max:255',
+        ]);
+
+        Permission::create([
+            'name' => $request->name,
+            'display_name' => $request->display_name,
+            'description' => $request->description,
+        ]);
+
+        return to_route('permissions.index', ['page' => request('page', 1)]);
     }
 
     /**
@@ -53,7 +75,19 @@ class PermissionDataController extends Controller
      */
     public function update(Request $request, Permission $permission)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255|unique:' . Permission::class,
+            'display_name' => 'required|string|max:255',
+            'description' => 'required|string|max:255',
+        ]);
+
+        $permission->update([
+            'name' => $request->name,
+            'display_name' => $request->display_name,
+            'description' => $request->description,
+        ]);
+
+        return to_route('permissions.index', ['page' => request('page', 1)]);
     }
 
     /**
@@ -61,6 +95,7 @@ class PermissionDataController extends Controller
      */
     public function destroy(Permission $permission)
     {
-        //
+        $permission->delete();
+        return to_route('permissions.index', ['page' => request('page', 1)]);
     }
 }

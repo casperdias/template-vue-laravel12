@@ -41,6 +41,7 @@ import {
 
 import DeleteItem from '@/components/DeleteItem.vue'
 import FormDialog from '@/components/FormDialog.vue'
+import { changePage } from '@/lib/utils'
 
 const { toast } = useToast()
 
@@ -62,13 +63,6 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-
-const changePage = (newPage: number) => {
-    router.get(route('users.index'), { page: newPage }, {
-        preserveState: true,
-        preserveScroll: true,
-    });
-};
 
 const sendNotification = async (userId: number) => {
     try {
@@ -269,15 +263,15 @@ const editUser = (users: PaginationData<User>) => {
                 :default-page="users.current_page"
             >
                 <PaginationList v-slot="{ items }" class="flex items-center justify-center gap-1">
-                    <PaginationFirst @click="changePage(users.from)"/>
-                    <PaginationPrev @click="changePage(users.current_page - 1)"/>
+                    <PaginationFirst @click="changePage('users.index', users.from)"/>
+                    <PaginationPrev @click="changePage('users.index', users.current_page - 1)"/>
 
                     <template v-for="(item, index) in items">
                         <PaginationListItem v-if="item.type === 'page'" :key="index" :value="item.value" as-child>
                             <Button
                                 class="w-10 h-10 p-0"
                                 :variant="item.value === page ? 'default' : 'outline'"
-                                @click="changePage(item.value)"
+                                @click="changePage('users.index', item.value)"
                             >
                                 {{ item.value }}
                             </Button>
@@ -285,8 +279,8 @@ const editUser = (users: PaginationData<User>) => {
                         <PaginationEllipsis v-else :key="item.type" :index="index" />
                     </template>
 
-                    <PaginationNext @click="changePage(users.current_page + 1)"/>
-                    <PaginationLast @click="changePage(users.last_page)"/>
+                    <PaginationNext @click="changePage('users.index', users.current_page + 1)"/>
+                    <PaginationLast @click="changePage('users.index', users.last_page)"/>
                 </PaginationList>
             </Pagination>
         </div>
@@ -338,6 +332,10 @@ const editUser = (users: PaginationData<User>) => {
     </FormDialog>
 
     <!-- Delete Dialog -->
-    <DeleteItem :open="deleteDialogOpen" :itemName="selectedUser?.name" @update:open="deleteDialogOpen = $event" @delete="deleteUser(users)" />
+    <DeleteItem
+        :open="deleteDialogOpen"
+        :itemName="selectedUser?.name"
+        @update:open="deleteDialogOpen = $event"
+        @delete="deleteUser(users)"
+    />
 </template>
-
