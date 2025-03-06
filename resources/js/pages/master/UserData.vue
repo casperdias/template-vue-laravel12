@@ -30,16 +30,6 @@ import {
     PaginationPrev,
 } from '@/components/ui/pagination'
 import {
-    Dialog,
-    DialogContent,
-    DialogClose,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@/components/ui/dialog'
-import {
     Select,
     SelectContent,
     SelectGroup,
@@ -49,7 +39,8 @@ import {
     SelectValue,
 } from '@/components/ui/select'
 
-import { LoaderCircle } from 'lucide-vue-next';
+import DeleteItem from '@/components/DeleteItem.vue'
+import FormDialog from '@/components/FormDialog.vue'
 
 const { toast } = useToast()
 
@@ -182,79 +173,64 @@ const editUser = (users: PaginationData<User>) => {
     <Head title="User Data" />
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-            <Dialog v-model:open="addDialog">
-                <DialogTrigger as-child>
-                <Button variant="outline">
-                    Tambah User
-                </Button>
-                </DialogTrigger>
-                <DialogContent class="sm:max-w-[425px]">
-                    <form @submit.prevent="addUser(users)" class="space-y-4">
-                        <DialogHeader>
-                            <DialogTitle>Tambah User</DialogTitle>
-                            <DialogDescription>
-                                Masukkan Nama dan email
-                            </DialogDescription>
-                        </DialogHeader>
-                        <div class="grid gap-2">
-                            <Label for="name">Name</Label>
-                            <Input id="name" type="text" required autofocus :tabindex="1" autocomplete="name" v-model="form.name" placeholder="Full name" />
-                            <InputError :message="form.errors.name" />
-                        </div>
+            <Button @click="addDialog = true" variant="outline">Tambah User</Button>
+            <FormDialog
+                v-model:open="addDialog"
+                title="Tambah User"
+                description="Masukkan Nama dan email"
+                submitText="Create account"
+                :processing="form.processing"
+                :onSubmit="() => addUser(users)"
+            >
+                <div class="grid gap-2">
+                    <Label for="name">Name</Label>
+                    <Input id="name" type="text" required autofocus :tabindex="1" autocomplete="name" v-model="form.name" placeholder="Full name" />
+                    <InputError :message="form.errors.name" />
+                </div>
 
-                        <div class="grid gap-2">
-                            <Label for="email">Email address</Label>
-                            <Input id="email" type="email" required :tabindex="2" autocomplete="email" v-model="form.email" placeholder="email@example.com" />
-                            <InputError :message="form.errors.email" />
-                        </div>
+                <div class="grid gap-2">
+                    <Label for="email">Email address</Label>
+                    <Input id="email" type="email" required :tabindex="2" autocomplete="email" v-model="form.email" placeholder="email@example.com" />
+                    <InputError :message="form.errors.email" />
+                </div>
 
+                <div class="grid gap-2">
+                    <Label for="role">Role</Label>
+                    <Select v-model="form.role_id" id="role" required :tabindex="4">
+                        <SelectTrigger>
+                            <SelectValue v-if="form.role_id" :value="form.role_id">
+                                {{ props.roles[form.role_id] }}
+                            </SelectValue>
+                            <SelectValue v-else>
+                                Select Role
+                            </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectGroup>
+                                <SelectLabel>Roles</SelectLabel>
+                                <SelectItem v-for="(role, id) in props.roles" :key="id" :value="id">
+                                    {{ role }}
+                                </SelectItem>
+                            </SelectGroup>
+                        </SelectContent>
+                    </Select>
+                    <InputError :message="form.errors.role_id" />
+                </div>
 
-
-                        <div class="grid gap-2">
-                            <Label for="role">Role</Label>
-                            <Select v-model="form.role_id" id="role" required :tabindex="4">
-                                <SelectTrigger>
-                                    <SelectValue v-if="form.role_id" :value="form.role_id">
-                                        {{ props.roles[form.role_id] }}
-                                    </SelectValue>
-                                    <SelectValue v-else>
-                                        Select Role
-                                    </SelectValue>
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectGroup>
-                                        <SelectLabel>Roles</SelectLabel>
-                                        <SelectItem v-for="(role, id) in props.roles" :key="id" :value="id">
-                                            {{ role }}
-                                        </SelectItem>
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
-                            <InputError :message="form.errors.role_id" />
-                        </div>
-
-                        <div class="grid gap-2">
-                            <Label for="password">Password</Label>
-                            <Input
-                                id="password"
-                                type="password"
-                                required
-                                :tabindex="3"
-                                autocomplete="new-password"
-                                v-model="form.password"
-                                placeholder="Password"
-                            />
-                            <InputError :message="form.errors.password" />
-                        </div>
-                        <DialogFooter>
-                            <Button type="submit" class="mt-2 w-full" tabindex="5" :disabled="form.processing">
-                                <LoaderCircle v-if="form.processing" class="h-4 w-4 animate-spin" />
-                                Create account
-                            </Button>
-                        </DialogFooter>
-                    </form>
-                </DialogContent>
-            </Dialog>
+                <div class="grid gap-2">
+                    <Label for="password">Password</Label>
+                    <Input
+                        id="password"
+                        type="password"
+                        required
+                        :tabindex="3"
+                        autocomplete="new-password"
+                        v-model="form.password"
+                        placeholder="Password"
+                    />
+                    <InputError :message="form.errors.password" />
+                </div>
+            </FormDialog>
             <Table>
                 <TableCaption>Data User Aplikasi</TableCaption>
                 <TableHeader>
@@ -316,76 +292,52 @@ const editUser = (users: PaginationData<User>) => {
         </div>
     </AppLayout>
 
-    <!-- Delete Dialog -->
-    <Dialog v-model:open="deleteDialogOpen">
-        <DialogContent class="bg-white dark:bg-gray-900 shadow-lg rounded-lg">
-            <DialogHeader>
-                <DialogTitle>Confirm Delete</DialogTitle>
-                <DialogDescription>
-                Are you sure you want to delete {{ selectedUser?.name }}?
-                </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-                <Button variant="destructive" @click="deleteUser(users)">Delete</Button>
-                <DialogClose as-child>
-                <Button variant="secondary">Cancel</Button>
-                </DialogClose>
-            </DialogFooter>
-        </DialogContent>
-    </Dialog>
-
     <!-- Edit Dialog -->
-    <Dialog v-model:open="editDialogOpen">
-        <DialogContent class="bg-white dark:bg-gray-900 shadow-lg rounded-lg">
-            <DialogHeader>
-                <DialogTitle>Edit User</DialogTitle>
-                <DialogDescription>
-                Edit {{ selectedUser?.name }}
-                </DialogDescription>
-            </DialogHeader>
-            <!-- Edit name and email -->
-            <form @submit.prevent="editUser(users)" class="space-y-4">
-                <div class="grid gap-2">
-                    <Label for="name">Name</Label>
-                    <Input id="name" type="text" required autofocus :tabindex="1" autocomplete="name" v-model="form.name" placeholder="Full name" />
-                    <InputError :message="form.errors.name" />
-                </div>
+    <FormDialog
+        v-model:open="editDialogOpen"
+        title="Edit User"
+        :description="`Edit ${selectedUser?.name || ''}`"
+        submitText="Ubah"
+        :processing="form.processing"
+        :onSubmit="() => editUser(users)"
+    >
+        <div class="grid gap-2">
+            <Label for="name">Name</Label>
+            <Input id="name" type="text" required autofocus :tabindex="1" autocomplete="name" v-model="form.name" placeholder="Full name" />
+            <InputError :message="form.errors.name" />
+        </div>
 
-                <div class="grid gap-2">
-                    <Label for="email">Email address</Label>
-                    <Input id="email" type="email" required :tabindex="2" autocomplete="email" v-model="form.email" placeholder="Email" />
-                    <InputError :message="form.errors.email" />
-                </div>
+        <div class="grid gap-2">
+            <Label for="email">Email address</Label>
+            <Input id="email" type="email" required :tabindex="2" autocomplete="email" v-model="form.email" placeholder="Email" />
+            <InputError :message="form.errors.email" />
+        </div>
 
-                <div class="grid gap-2">
-                    <Label for="role">Role</Label>
-                    <Select v-model="form.role_id" id="role" required :tabindex="4">
-                        <SelectTrigger>
-                            <SelectValue v-if="form.role_id" :value="form.role_id">
-                                {{ props.roles[form.role_id] }}
-                            </SelectValue>
-                            <SelectValue v-else>
-                                Select Role
-                            </SelectValue>
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectGroup>
-                                <SelectLabel>Roles</SelectLabel>
-                                <SelectItem v-for="(role, id) in props.roles" :key="id" :value="id">
-                                    {{ role }}
-                                </SelectItem>
-                            </SelectGroup>
-                        </SelectContent>
-                    </Select>
-                    <InputError :message="form.errors.role_id" />
-                </div>
-                <DialogFooter>
-                    <DialogClose as-child>
-                        <Button variant="secondary">Cancel</Button>
-                    </DialogClose>
-                    <Button type="submit">Ubah</Button>
-                </DialogFooter>
-            </form>
-        </DialogContent>
-    </Dialog>
+        <div class="grid gap-2">
+            <Label for="role">Role</Label>
+            <Select v-model="form.role_id" id="role" required :tabindex="4">
+                <SelectTrigger>
+                    <SelectValue v-if="form.role_id" :value="form.role_id">
+                        {{ props.roles[form.role_id] }}
+                    </SelectValue>
+                    <SelectValue v-else>
+                        Select Role
+                    </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectGroup>
+                        <SelectLabel>Roles</SelectLabel>
+                        <SelectItem v-for="(role, id) in props.roles" :key="id" :value="id">
+                            {{ role }}
+                        </SelectItem>
+                    </SelectGroup>
+                </SelectContent>
+            </Select>
+            <InputError :message="form.errors.role_id" />
+        </div>
+    </FormDialog>
+
+    <!-- Delete Dialog -->
+    <DeleteItem :open="deleteDialogOpen" :itemName="selectedUser?.name" @update:open="deleteDialogOpen = $event" @delete="deleteUser(users)" />
 </template>
+
