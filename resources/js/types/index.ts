@@ -15,7 +15,7 @@ export interface NavItem {
     href: string;
     icon?: LucideIcon;
     isActive?: boolean;
-    permission?: boolean;
+    permission?: string;
 }
 
 export interface SharedData extends PageProps {
@@ -37,6 +37,7 @@ export interface User {
         id: number;
         display_name: string;
     };
+    permissions: string[]
 }
 
 export interface PaginationData<T> {

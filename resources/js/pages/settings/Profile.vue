@@ -68,7 +68,6 @@ const user = page.props.auth.user as User;
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
         <Head title="Profile settings" />
-
         <SettingsLayout>
             <div v-if="mustVerifyEmail && !user.email_verified_at" class="flex flex-col space-y-6">
                 <p class="-mt-4 text-sm text-muted-foreground">
