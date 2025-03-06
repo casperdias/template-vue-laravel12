@@ -21,7 +21,7 @@ class RolePermissionSeeder extends Seeder
 
         // Make example permissions
         $permissions = \App\Models\Permission::create([
-            'name' => 'view-this-sidebar',
+            'name' => 'master-data',
             'display_name' => 'Example',
             'description' => 'Example Permission',
         ]);
@@ -40,8 +40,6 @@ class RolePermissionSeeder extends Seeder
             'description' => 'Supervisor Role',
         ]);
 
-        // Attach permissions to spv and super admin
         $roleSuperAdmin->permissions()->attach($permissions->id);
-        $roleSpv->permissions()->attach($permissions->id);
     }
 }

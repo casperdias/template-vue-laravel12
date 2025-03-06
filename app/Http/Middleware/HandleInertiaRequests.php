@@ -37,8 +37,9 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
-        $user = $request->user()->load('role.permissions');
-        $userData = [
+        $user = $request->user();
+
+        $userData = $user ? [
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
@@ -47,7 +48,7 @@ class HandleInertiaRequests extends Middleware
             'updated_at' => $user->updated_at,
             'role' => $user->role ? $user->role->display_name : null,
             'permissions' => $user->role ? $user->role->permissions->pluck('name') : [],
-        ];
+        ] : null;
 
         return [
             ...parent::share($request),
