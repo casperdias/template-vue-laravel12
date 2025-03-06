@@ -16,7 +16,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
 
-    Route::prefix('master-data')->group(function () {
+    Route::prefix('master-data')->middleware('permission:master-data')->group(function () {
         Route::get('/', MasterController::class)->name('master-data');
         Route::resources([
             'users' => UserDataController::class,
