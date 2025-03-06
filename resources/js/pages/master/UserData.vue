@@ -153,7 +153,7 @@ const openEditDialog = (user: User) => {
     selectedUser.value = user;
     form.name = user.name;
     form.email = user.email;
-    form.role_id = String(user.role_id);
+    form.role_id = String(user.role?.id);
     editDialogOpen.value = true;
 };
 

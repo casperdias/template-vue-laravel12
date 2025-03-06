@@ -1,16 +1,50 @@
 <script setup lang="ts">
-import { TransitionRoot } from '@headlessui/vue';
-import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 
-import DeleteUser from '@/components/DeleteUser.vue';
-import HeadingSmall from '@/components/HeadingSmall.vue';
-import InputError from '@/components/InputError.vue';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { type BreadcrumbItem, type SharedData, type User } from '@/types';
+
+import { useForm } from '@inertiajs/vue3';
+import { ref } from 'vue';
+
+import HeadingSmall from '@/components/HeadingSmall.vue';
+import InputError from '@/components/InputError.vue';
+import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+
+const passwordInput = ref<HTMLInputElement | null>(null);
+
+const form = useForm({
+    password: '',
+});
+
+const deleteUser = (e: Event) => {
+    e.preventDefault();
+
+    form.delete(route('profile.destroy'), {
+        preserveScroll: true,
+        onSuccess: () => closeModal(),
+        onError: () => passwordInput.value?.focus(),
+        onFinish: () => form.reset(),
+    });
+};
+
+const closeModal = () => {
+    form.clearErrors();
+    form.reset();
+};
 
 interface Props {
     mustVerifyEmail: boolean;
@@ -29,16 +63,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 const page = usePage<SharedData>();
 const user = page.props.auth.user as User;
 
-const form = useForm({
-    name: user.name,
-    email: user.email,
-});
-
-const submit = () => {
-    form.patch(route('profile.update'), {
-        preserveScroll: true,
-    });
-};
 </script>
 
 <template>
@@ -46,65 +70,65 @@ const submit = () => {
         <Head title="Profile settings" />
 
         <SettingsLayout>
-            <div class="flex flex-col space-y-6">
-                <HeadingSmall title="Profile information" description="Update your name and email address" />
+            <div v-if="mustVerifyEmail && !user.email_verified_at" class="flex flex-col space-y-6">
+                <p class="-mt-4 text-sm text-muted-foreground">
+                    Your email address is unverified.
+                    <Link
+                        :href="route('verification.send')"
+                        method="post"
+                        as="button"
+                        class="hover:!decoration-current text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out dark:decoration-neutral-500"
+                    >
+                        Click here to resend the verification email.
+                    </Link>
+                </p>
 
-                <form @submit.prevent="submit" class="space-y-6">
-                    <div class="grid gap-2">
-                        <Label for="name">Name</Label>
-                        <Input id="name" class="mt-1 block w-full" v-model="form.name" required autocomplete="name" placeholder="Full name" />
-                        <InputError class="mt-2" :message="form.errors.name" />
-                    </div>
-
-                    <div class="grid gap-2">
-                        <Label for="email">Email address</Label>
-                        <Input
-                            id="email"
-                            type="email"
-                            class="mt-1 block w-full"
-                            v-model="form.email"
-                            required
-                            autocomplete="username"
-                            placeholder="Email address"
-                        />
-                        <InputError class="mt-2" :message="form.errors.email" />
-                    </div>
-
-                    <div v-if="mustVerifyEmail && !user.email_verified_at">
-                        <p class="-mt-4 text-sm text-muted-foreground">
-                            Your email address is unverified.
-                            <Link
-                                :href="route('verification.send')"
-                                method="post"
-                                as="button"
-                                class="hover:!decoration-current text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out dark:decoration-neutral-500"
-                            >
-                                Click here to resend the verification email.
-                            </Link>
-                        </p>
-
-                        <div v-if="status === 'verification-link-sent'" class="mt-2 text-sm font-medium text-green-600">
-                            A new verification link has been sent to your email address.
-                        </div>
-                    </div>
-
-                    <div class="flex items-center gap-4">
-                        <Button :disabled="form.processing">Save</Button>
-
-                        <TransitionRoot
-                            :show="form.recentlySuccessful"
-                            enter="transition ease-in-out"
-                            enter-from="opacity-0"
-                            leave="transition ease-in-out"
-                            leave-to="opacity-0"
-                        >
-                            <p class="text-sm text-neutral-600">Saved.</p>
-                        </TransitionRoot>
-                    </div>
-                </form>
+                <div v-if="status === 'verification-link-sent'" class="mt-2 text-sm font-medium text-green-600">
+                    A new verification link has been sent to your email address.
+                </div>
             </div>
 
-            <DeleteUser />
+            <div class="space-y-6">
+                <HeadingSmall title="Delete account" description="Delete your account and all of its resources" />
+                <div class="space-y-4 rounded-lg border border-red-100 bg-red-50 p-4 dark:border-red-200/10 dark:bg-red-700/10">
+                    <div class="relative space-y-0.5 text-red-600 dark:text-red-100">
+                        <p class="font-medium">Warning</p>
+                        <p class="text-sm">Please proceed with caution, this cannot be undone.</p>
+                    </div>
+                    <Dialog>
+                        <DialogTrigger as-child>
+                            <Button variant="destructive">Delete account</Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <form class="space-y-6" @submit="deleteUser">
+                                <DialogHeader class="space-y-3">
+                                    <DialogTitle>Are you sure you want to delete your account?</DialogTitle>
+                                    <DialogDescription>
+                                        Once your account is deleted, all of its resources and data will also be permanently deleted. Please enter your
+                                        password to confirm you would like to permanently delete your account.
+                                    </DialogDescription>
+                                </DialogHeader>
+
+                                <div class="grid gap-2">
+                                    <Label for="password" class="sr-only">Password</Label>
+                                    <Input id="password" type="password" name="password" ref="passwordInput" v-model="form.password" placeholder="Password" />
+                                    <InputError :message="form.errors.password" />
+                                </div>
+
+                                <DialogFooter class="gap-2">
+                                    <DialogClose as-child>
+                                        <Button variant="secondary" @click="closeModal"> Cancel </Button>
+                                    </DialogClose>
+
+                                    <Button variant="destructive" :disabled="form.processing">
+                                        <button type="submit">Delete account</button>
+                                    </Button>
+                                </DialogFooter>
+                            </form>
+                        </DialogContent>
+                    </Dialog>
+                </div>
+            </div>
         </SettingsLayout>
     </AppLayout>
 </template>
