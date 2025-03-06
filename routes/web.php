@@ -11,7 +11,7 @@ Route::get('/', function () {
     return redirect()->route('dashboard');
 })->name('home');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', \Inertia\EncryptHistoryMiddleware::class])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
