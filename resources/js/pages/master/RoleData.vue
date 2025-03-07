@@ -3,34 +3,15 @@ import { ref } from "vue";
 import AppLayout from '@/layouts/AppLayout.vue';
 import { PaginationData, type BreadcrumbItem } from '@/types';
 import { Head, useForm, router } from '@inertiajs/vue3';
-import {
-    Table,
-    TableBody,
-    TableCaption,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table'
-import {
-    Pagination,
-    PaginationEllipsis,
-    PaginationFirst,
-    PaginationLast,
-    PaginationList,
-    PaginationListItem,
-    PaginationNext,
-    PaginationPrev,
-} from '@/components/ui/pagination'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
-import { changePage } from '@/lib/utils'
 import DeleteItem from '@/components/DeleteItem.vue'
 import FormDialog from '@/components/FormDialog.vue'
 import InputError from '@/components/InputError.vue';
 import { useToast } from '@/components/ui/toast/use-toast'
 import Toaster from '@/components/ui/toast/Toaster.vue'
+import TablePagination from "@/components/TablePagination.vue";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -186,57 +167,23 @@ const editRole = (roles: PaginationData<Role>) => {
                     <InputError v-if="errors.description" :message="errors.description" />
                 </div>
             </FormDialog>
-            <Table>
-                <TableCaption>Data Role</TableCaption>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>Nama</TableHead>
-                        <TableHead>Role</TableHead>
-                        <TableHead>Description</TableHead>
-                        <TableHead>Action</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    <TableRow v-for="role in roles.data" :key="role.id">
-                        <TableCell>{{ role.name }}</TableCell>
-                        <TableCell>{{ role.display_name }}</TableCell>
-                        <TableCell>{{ role.description }}</TableCell>
-                        <TableCell class="flex gap-2">
-                            <Button @click="openEditDialog(role)">Edit</Button>
-                            <Button @click="openDeleteDialog(role)" >Delete</Button>
-                        </TableCell>
-                    </TableRow>
-                </TableBody>
-            </Table>
-            <Pagination
-                v-slot="{ page }"
-                :items-per-page="roles.per_page"
-                :total="roles.total"
-                :sibling-count="1"
-                show-edges
-                :default-page="roles.current_page"
+            <TablePagination
+                :columns="[
+                    { key: 'name', label: 'Name' },
+                    { key: 'display_name', label: 'Display Name' },
+                    { key: 'description', label: 'Description' },
+                ]"
+                :data="roles.data"
+                :pagination="roles"
+                :caption="'Role Data'"
+                :actions="true"
+                routeName="roles.index"
             >
-                <PaginationList v-slot="{ items }" class="flex items-center justify-center gap-1">
-                    <PaginationFirst @click="changePage('roles.index', roles.from)"/>
-                    <PaginationPrev @click="changePage('roles.index', roles.current_page - 1)"/>
-
-                    <template v-for="(item, index) in items">
-                        <PaginationListItem v-if="item.type === 'page'" :key="index" :value="item.value" as-child>
-                            <Button
-                                class="w-10 h-10 p-0"
-                                :variant="item.value === page ? 'default' : 'outline'"
-                                @click="changePage('roles.index', item.value)"
-                            >
-                                {{ item.value }}
-                            </Button>
-                        </PaginationListItem>
-                        <PaginationEllipsis v-else :key="item.type" :index="index" />
-                    </template>
-
-                    <PaginationNext @click="changePage('roles.index', roles.current_page + 1)"/>
-                    <PaginationLast @click="changePage('roles.index', roles.last_page)"/>
-                </PaginationList>
-            </Pagination>
+                <template #actions="{ item }">
+                    <Button @click="openEditDialog(item)">Edit</Button>
+                    <Button @click="openDeleteDialog(item)">Delete</Button>
+                </template>
+            </TablePagination>
         </div>
     </AppLayout>
 
