@@ -41,7 +41,7 @@ import {
 import { Search, Pencil, Trash2 } from 'lucide-vue-next'
 import DeleteItem from '@/components/DeleteItem.vue'
 import FormDialog from '@/components/FormDialog.vue'
-import { changePage } from '@/lib/utils'
+import { changePage } from '@/lib/helper'
 
 const { toast } = useToast()
 

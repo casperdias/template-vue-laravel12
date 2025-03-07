@@ -19,7 +19,7 @@ import {
     PaginationPrev,
 } from '@/components/ui/pagination';
 import { Button } from '@/components/ui/button';
-import { changePage } from '@/lib/utils';
+import { changePage } from '@/lib/helper';
 
 defineProps({
     columns: {
