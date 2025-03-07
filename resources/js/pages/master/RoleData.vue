@@ -148,7 +148,7 @@ watch(searchTerm, (newTerm) => {
         router.get(route("roles.index", {
             search: newTerm
         }));
-    }, 300);
+    }, 1000);
 });
 </script>
 
@@ -215,7 +215,7 @@ watch(searchTerm, (newTerm) => {
                 <template #actions="{ item }">
                     <Button @click="openEditDialog(item)">Edit</Button>
                     <Button @click="openDeleteDialog(item)">Delete</Button>
-                    <Link :href="route('dashboard')">
+                    <Link :href="route('role.setting', item.id)">
                         <Button>Atur Permission</Button>
                     </Link>
                 </template>

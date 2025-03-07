@@ -7,6 +7,7 @@ use App\Http\Controllers\Master\MasterController;
 use App\Http\Controllers\Master\UserDataController;
 use App\Http\Controllers\Master\RoleDataController;
 use App\Http\Controllers\Master\PermissionDataController;
+use App\Http\Controllers\Master\RolePermissionController;
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
@@ -24,6 +25,10 @@ Route::middleware(['auth', 'verified', \Inertia\EncryptHistoryMiddleware::class]
             'roles' => RoleDataController::class,
             'permissions' => PermissionDataController::class,
         ]);
+        Route::controller(RolePermissionController::class)->group(function () {
+            Route::get('roles/{id}/setting', 'index')->name('role.setting');
+            Route::post('roles/{id}/setting/{permissionId}', 'store')->name('role.setting.update');
+        });
     });
 });
 

@@ -184,7 +184,7 @@ watch(searchTerm, (newTerm) => {
         router.get(route("users.index", {
             search: newTerm
         }));
-    }, 300);
+    }, 1000);
 });
 </script>
 
