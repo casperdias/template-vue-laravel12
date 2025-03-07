@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import AppLayout from '@/layouts/AppLayout.vue';
 import { PaginationData, type BreadcrumbItem } from '@/types';
 import { Head, useForm, router, Link } from '@inertiajs/vue3';
@@ -12,6 +12,7 @@ import InputError from '@/components/InputError.vue';
 import { useToast } from '@/components/ui/toast/use-toast'
 import Toaster from '@/components/ui/toast/Toaster.vue'
 import TablePagination from "@/components/TablePagination.vue";
+import { Search } from 'lucide-vue-next'
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -49,7 +50,11 @@ const form = useForm({
 const addDialog = ref(false);
 
 const addRole = (roles: PaginationData<Role>) => {
-    form.post(route('roles.store', { page: roles.current_page }), {
+    form.post(route('roles.store', {
+        page: roles.current_page,
+        search: searchTerm.value // Preserve search
+    }),
+    {
         preserveState: true,
         preserveScroll: true,
         onSuccess: () => {
@@ -75,7 +80,12 @@ const openDeleteDialog = (role: Role) => {
 const deleteRole = (roles: PaginationData<Role>) => {
     const roleName = selectedRole.value?.name;
     if (selectedRole.value) {
-        router.delete(route('roles.destroy', { role: selectedRole.value?.id, page: roles.current_page }), {
+        router.delete(route('roles.destroy', {
+            role: selectedRole.value?.id,
+            page: roles.current_page,
+            search: searchTerm.value // Preserve search
+        }),
+        {
             preserveState: true,
             preserveScroll: true,
             onSuccess: () => {
@@ -108,7 +118,12 @@ const openEditDialog = (role: Role) => {
 
 const editRole = (roles: PaginationData<Role>) => {
     if (selectedRole.value) {
-        form.put(route('roles.update', { role: selectedRole.value?.id, page: roles.current_page }), {
+        form.put(route('roles.update', {
+            role: selectedRole.value?.id,
+            page: roles.current_page,
+            search: searchTerm.value // Preserve search
+        }),
+        {
             preserveState: true,
             preserveScroll: true,
             onSuccess: () => {
@@ -123,6 +138,18 @@ const editRole = (roles: PaginationData<Role>) => {
         });
     }
 };
+
+const searchTerm = ref(route().params.search || "");
+let searchTimeout: ReturnType<typeof setTimeout>;
+
+watch(searchTerm, (newTerm) => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        router.get(route("roles.index", {
+            search: newTerm
+        }));
+    }, 300);
+});
 </script>
 
 <template>
@@ -130,6 +157,12 @@ const editRole = (roles: PaginationData<Role>) => {
     <Head title="Role Data" />
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+            <div class="relative w-full max-w-sm items-center">
+                <Input id="search" type="text" name="search" placeholder="Search..." class="pl-10" v-model="searchTerm" />
+                <span class="absolute start-0 inset-y-0 flex items-center justify-center px-2">
+                    <Search class="size-6 text-muted-foreground" />
+                </span>
+            </div>
             <Button @click="addDialog = true" variant="outline">Tambah Role</Button>
             <FormDialog
                 v-model:open="addDialog"

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import axios from 'axios'
 import { User, PaginationData, type BreadcrumbItem } from '@/types'
 import { Head, useForm, router } from '@inertiajs/vue3'
@@ -38,7 +38,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
-
+import { Search } from 'lucide-vue-next'
 import DeleteItem from '@/components/DeleteItem.vue'
 import FormDialog from '@/components/FormDialog.vue'
 import { changePage } from '@/lib/utils'
@@ -89,12 +89,16 @@ const form = useForm({
 const addDialog = ref(false);
 
 const addUser = (users: PaginationData<User>) => {
-    form.post(route('users.store', { page: users.current_page }), {
-        preserveState: true,
-        preserveScroll: true,
-        onSuccess: () => {
-            addDialog.value = false;
-            form.reset();
+    form.post(route('users.store', {
+            page: users.current_page,
+            search: searchTerm.value // Preserve search
+        }),
+        {
+            preserveState: true,
+            preserveScroll: true,
+            onSuccess: () => {
+                addDialog.value = false;
+                form.reset();
         },
     });
 };
@@ -111,7 +115,12 @@ const openDeleteDialog = (user: User) => {
 const deleteUser = (users: PaginationData<User>) => {
     const userName = selectedUser.value?.name;
     if (selectedUser.value) {
-        router.delete(route('users.destroy', { user: selectedUser.value?.id, page: users.current_page }), {
+        router.delete(route('users.destroy', {
+            user: selectedUser.value?.id,
+            page: users.current_page,
+            search: searchTerm.value // Preserve search
+        }),
+        {
             preserveState: true,
             preserveScroll: true,
             onSuccess: () => {
@@ -145,7 +154,12 @@ const openEditDialog = (user: User) => {
 const editUser = (users: PaginationData<User>) => {
     if (selectedUser.value) {
         const userName = form.name;
-        form.put(route('users.update', { user: selectedUser.value?.id, page: users.current_page }), {
+        form.put(route('users.update', {
+            user: selectedUser.value?.id,
+            page: users.current_page,
+            search: searchTerm.value // Preserve search
+        }),
+        {
             preserveState: true,
             preserveScroll: true,
             onSuccess: () => {
@@ -160,6 +174,18 @@ const editUser = (users: PaginationData<User>) => {
         });
     }
 };
+
+const searchTerm = ref(route().params.search || "");
+let searchTimeout: ReturnType<typeof setTimeout>;
+
+watch(searchTerm, (newTerm) => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        router.get(route("users.index", {
+            search: newTerm
+        }));
+    }, 300);
+});
 </script>
 
 <template>
@@ -167,6 +193,12 @@ const editUser = (users: PaginationData<User>) => {
     <Head title="User Data" />
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+            <div class="relative w-full max-w-sm items-center">
+                <Input id="search" type="text" name="search" placeholder="Search..." class="pl-10" v-model="searchTerm" />
+                <span class="absolute start-0 inset-y-0 flex items-center justify-center px-2">
+                    <Search class="size-6 text-muted-foreground" />
+                </span>
+            </div>
             <Button @click="addDialog = true" variant="outline">Tambah User</Button>
             <FormDialog
                 v-model:open="addDialog"

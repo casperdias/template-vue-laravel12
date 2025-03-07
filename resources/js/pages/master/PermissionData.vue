@@ -146,7 +146,7 @@ watch(searchTerm, (newTerm) => {
             <FormDialog
                 v-model:open="addDialog"
                 title="Tambah Permission"
-                description="Masukkan Nama dan email"
+                description="Masukkan Nama dan Deskripsi"
                 submitText="Create account"
                 :processing="form.processing"
                 :onSubmit="() => addPermission(permissions)"
