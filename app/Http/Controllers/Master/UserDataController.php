@@ -22,13 +22,19 @@ class UserDataController extends Controller
     {
         $page = request()->input('page', 1);
         $per_page = request()->input('per_page', 5);
+        $search = request()->input('search', '');
         $users = User::with('role:id,display_name')
                 ->select('id', 'name', 'email', 'created_at', 'email_verified_at', 'role_id')
+                ->when($search, function ($query, $search) {
+                    return $query->where('name', 'like', "%{$search}%")
+                                ->orWhere('email', 'like', "%{$search}%");
+                })
                 ->paginate($per_page, ['*'], 'page', $page);
         $roles = Role::all()->pluck('display_name', 'id');
         return Inertia::render('master/UserData', [
             'users' => $users,
             'roles' => $roles,
+            'search' => $search
         ]);
     }
 
@@ -61,7 +67,10 @@ class UserDataController extends Controller
 
         event(new Registered($user));
 
-        return to_route('users.index', ['page' => request('page', 1)]);
+        return to_route('users.index', [
+            'page' => request('page', 1),
+            'search' => request('search', '')
+        ]);
     }
 
     /**
@@ -93,7 +102,10 @@ class UserDataController extends Controller
 
         $user->update($request->only('name', 'email', 'role_id'));
 
-        return to_route('users.index', ['page' => request('page', 1)]);
+        return to_route('users.index', [
+            'page' => request('page', 1),
+            'search' => request('search', '')
+        ]);
     }
 
     /**
@@ -107,6 +119,9 @@ class UserDataController extends Controller
 
         $user->delete();
 
-        return to_route('users.index', ['page' => request('page', 1)]);
+        return to_route('users.index', [
+            'page' => request('page', 1),
+            'search' => request('search', '')
+        ]);
     }
 }

@@ -18,11 +18,17 @@ class RoleDataController extends Controller
     {
         $page = request()->input('page', 1);
         $per_page = request()->input('per_page', 5);
+        $search = request()->input('search', '');
         $roles = Role::select('id', 'name', 'display_name', 'description')
+            ->when($search, function ($query, $search) {
+                return $query->where('name', 'like', "%{$search}%")
+                            ->orWhere('display_name', 'like', "%{$search}%");
+            })
             ->orderBy('id', 'asc')
             ->paginate($per_page, ['*'], 'page', $page);
         return Inertia::render('master/RoleData', [
             'roles' => $roles,
+            'search' => $search
         ]);
     }
 
@@ -51,7 +57,10 @@ class RoleDataController extends Controller
             'description' => $request->description,
         ]);
 
-        return to_route('roles.index', ['page' => request('page', 1)]);
+        return to_route('roles.index', [
+            'page' => request('page', 1),
+            'search' => request('search', '')
+        ]);
     }
 
     /**
@@ -87,7 +96,10 @@ class RoleDataController extends Controller
             'description' => $request->description,
         ]);
 
-        return to_route('roles.index', ['page' => request('page', 1)]);
+        return to_route('roles.index', [
+            'page' => request('page', 1),
+            'search' => request('search', '')
+        ]);
     }
 
     /**
@@ -96,6 +108,9 @@ class RoleDataController extends Controller
     public function destroy(Role $role)
     {
         $role->delete();
-        return to_route('roles.index', ['page' => request('page', 1)]);
+        return to_route('roles.index', [
+            'page' => request('page', 1),
+            'search' => request('search', '')
+        ]);
     }
 }

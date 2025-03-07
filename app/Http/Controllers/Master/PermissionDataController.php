@@ -18,11 +18,19 @@ class PermissionDataController extends Controller
     {
         $page = request()->input('page', 1);
         $per_page = request()->input('per_page', 5);
+        $search = request()->input('search', '');
+
         $permissions = Permission::select('id', 'name', 'display_name', 'description')
+            ->when($search, function ($query, $search) {
+                return $query->where('name', 'like', "%{$search}%")
+                            ->orWhere('display_name', 'like', "%{$search}%");
+            })
             ->orderBy('id', 'asc')
             ->paginate($per_page, ['*'], 'page', $page);
+
         return Inertia::render('master/PermissionData', [
             'permissions' => $permissions,
+            'search' => $search,
         ]);
     }
 
@@ -51,7 +59,10 @@ class PermissionDataController extends Controller
             'description' => $request->description,
         ]);
 
-        return to_route('permissions.index', ['page' => request('page', 1)]);
+        return to_route('permissions.index', [
+            'page' => request('page', 1),
+            'search' => request('search', '')
+        ]);
     }
 
     /**
@@ -87,7 +98,10 @@ class PermissionDataController extends Controller
             'description' => $request->description,
         ]);
 
-        return to_route('permissions.index', ['page' => request('page', 1)]);
+        return to_route('permissions.index', [
+            'page' => request('page', 1),
+            'search' => request('search', '')
+        ]);
     }
 
     /**
@@ -96,6 +110,9 @@ class PermissionDataController extends Controller
     public function destroy(Permission $permission)
     {
         $permission->delete();
-        return to_route('permissions.index', ['page' => request('page', 1)]);
+        return to_route('permissions.index', [
+            'page' => request('page', 1),
+            'search' => request('search', '')
+        ]);
     }
 }

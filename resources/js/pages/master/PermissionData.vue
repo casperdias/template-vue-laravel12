@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import AppLayout from '@/layouts/AppLayout.vue';
 import { PaginationData, type BreadcrumbItem } from '@/types';
 import { Head, useForm, router } from '@inertiajs/vue3';
@@ -12,6 +12,7 @@ import InputError from '@/components/InputError.vue';
 import { useToast } from '@/components/ui/toast/use-toast'
 import Toaster from '@/components/ui/toast/Toaster.vue'
 import TablePagination from "@/components/TablePagination.vue";
+import { Search } from 'lucide-vue-next'
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -49,16 +50,16 @@ const form = useForm({
 const addDialog = ref(false);
 
 const addPermission = (permissions: PaginationData<Permission>) => {
-    form.post(route('permissions.store', { page: permissions.current_page }), {
+    form.post(route("permissions.store", {
+        page: permissions.current_page,
+        search: searchTerm.value // Ensure search is passed
+    }), {
         preserveState: true,
         preserveScroll: true,
         onSuccess: () => {
             addDialog.value = false;
             form.reset();
-            toast({
-                title: 'Success',
-                description: 'Permission created successfully',
-            })
+            toast({ title: "Success", description: "Permission created successfully" });
         },
     });
 };
@@ -73,27 +74,18 @@ const openDeleteDialog = (permission: Permission) => {
 };
 
 const deletePermission = (permissions: PaginationData<Permission>) => {
-    const permissionName = selectedPermission.value?.name;
-    console.log(selectedPermission.value);
     if (selectedPermission.value) {
-        router.delete(route('permissions.destroy', { permission: selectedPermission.value?.id, page: permissions.current_page }), {
+        router.delete(route("permissions.destroy", {
+            permission: selectedPermission.value.id,
+            page: permissions.current_page,
+            search: searchTerm.value // Preserve search
+        }), {
             preserveState: true,
             preserveScroll: true,
             onSuccess: () => {
                 deleteDialogOpen.value = false;
                 selectedPermission.value = null;
-                toast({
-                    title: 'Permission deleted',
-                    description: 'Permission ' + permissionName + ' has been deleted successfully',
-                });
-            },
-            onError: (errors) => {
-                deleteDialogOpen.value = false;
-                selectedPermission.value = null;
-                toast({
-                    title: 'Error',
-                    description: errors.id || 'An error occurred while deleting the Permission',
-                });
+                toast({ title: "Deleted", description: "Permission deleted successfully" });
             },
         });
     }
@@ -109,21 +101,34 @@ const openEditDialog = (permission: Permission) => {
 
 const editPermission = (permissions: PaginationData<Permission>) => {
     if (selectedPermission.value) {
-        form.put(route('permissions.update', { permission: selectedPermission.value?.id, page: permissions.current_page }), {
+        form.put(route("permissions.update", {
+            permission: selectedPermission.value.id,
+            page: permissions.current_page,
+            search: searchTerm.value // Preserve search
+        }), {
             preserveState: true,
             preserveScroll: true,
             onSuccess: () => {
                 editDialogOpen.value = false;
                 selectedPermission.value = null;
                 form.reset();
-                toast({
-                    title: 'Success',
-                    description: 'Permission updated successfully',
-                });
+                toast({ title: "Success", description: "Permission updated successfully" });
             },
         });
     }
 };
+
+const searchTerm = ref(route().params.search || "");
+let searchTimeout: ReturnType<typeof setTimeout>;
+
+watch(searchTerm, (newTerm) => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        router.get(route("permissions.index", {
+            search: newTerm
+        }));
+    }, 300);
+});
 </script>
 
 <template>
@@ -131,6 +136,12 @@ const editPermission = (permissions: PaginationData<Permission>) => {
     <Head title="Permission Data" />
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+            <div class="relative w-full max-w-sm items-center">
+                <Input id="search" type="text" name="search" placeholder="Search..." class="pl-10" v-model="searchTerm" />
+                <span class="absolute start-0 inset-y-0 flex items-center justify-center px-2">
+                    <Search class="size-6 text-muted-foreground" />
+                </span>
+            </div>
             <Button @click="addDialog = true" variant="outline">Tambah Permission</Button>
             <FormDialog
                 v-model:open="addDialog"
