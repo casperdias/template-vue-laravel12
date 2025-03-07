@@ -5,6 +5,7 @@ use Inertia\Inertia;
 
 use App\Http\Controllers\Master\MasterController;
 use App\Http\Controllers\Master\UserDataController;
+use App\Http\Controllers\Master\RoleDataController;
 use App\Http\Controllers\Master\PermissionDataController;
 
 Route::get('/', function () {
@@ -20,6 +21,7 @@ Route::middleware(['auth', 'verified', \Inertia\EncryptHistoryMiddleware::class]
         Route::get('/', MasterController::class)->name('master-data');
         Route::resources([
             'users' => UserDataController::class,
+            'roles' => RoleDataController::class,
             'permissions' => PermissionDataController::class,
         ]);
     });
