@@ -12,7 +12,7 @@ import InputError from '@/components/InputError.vue';
 import { useToast } from '@/components/ui/toast/use-toast'
 import Toaster from '@/components/ui/toast/Toaster.vue'
 import TablePagination from "@/components/TablePagination.vue";
-import { Search } from 'lucide-vue-next'
+import { Search, Pencil, Trash2, Settings } from 'lucide-vue-next'
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -216,10 +216,16 @@ watch(searchTerm, (newTerm) => {
                 :routeName="roles.path"
             >
                 <template #actions="{ item }">
-                    <Button @click="openEditDialog(item)">Edit</Button>
-                    <Button @click="openDeleteDialog(item)">Delete</Button>
+                    <Button @click="openEditDialog(item)">
+                        <Pencil />
+                    </Button>
+                    <Button @click="openDeleteDialog(item)">
+                        <Trash2 />
+                    </Button>
                     <Link :href="route('role.setting', item.id)">
-                        <Button>Atur Permission</Button>
+                        <Button>
+                            <Settings />
+                        </Button>
                     </Link>
                 </template>
             </TablePagination>

@@ -11,7 +11,7 @@ import {
     CardTitle,
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { User, UserCog, ShieldPlus } from 'lucide-vue-next'
+import { User, UserCog, ShieldPlus, Eye } from 'lucide-vue-next'
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -79,6 +79,7 @@ const cards = [
                     <CardFooter>
                         <Link class="w-full" :href="card.url">
                             <Button class="w-full" variant="default">
+                                <Eye class="w-6 h-6 ml-2" />
                                 Lihat Data
                             </Button>
                         </Link>

@@ -38,7 +38,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
-import { Search } from 'lucide-vue-next'
+import { Search, Pencil, Trash2 } from 'lucide-vue-next'
 import DeleteItem from '@/components/DeleteItem.vue'
 import FormDialog from '@/components/FormDialog.vue'
 import { changePage } from '@/lib/utils'
@@ -283,8 +283,12 @@ watch(searchTerm, (newTerm) => {
                             </form>
                         </TableCell>
                         <TableCell class="flex gap-2">
-                            <Button @click="openEditDialog(user)">Edit</Button>
-                            <Button @click="openDeleteDialog(user)">Delete</Button>
+                            <Button @click="openEditDialog(user)">
+                                <Pencil />
+                            </Button>
+                            <Button @click="openDeleteDialog(user)">
+                                <Trash2 />
+                            </Button>
                         </TableCell>
                     </TableRow>
                 </TableBody>

@@ -29,6 +29,7 @@ class UserDataController extends Controller
                     return $query->where('name', 'like', "%{$search}%")
                                 ->orWhere('email', 'like', "%{$search}%");
                 })
+                ->orderBy('id', 'asc')
                 ->paginate($per_page, ['*'], 'page', $page);
         $roles = Role::all()->pluck('display_name', 'id');
         return Inertia::render('master/UserData', [
