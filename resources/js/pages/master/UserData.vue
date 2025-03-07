@@ -181,10 +181,13 @@ let searchTimeout: ReturnType<typeof setTimeout>;
 watch(searchTerm, (newTerm) => {
     clearTimeout(searchTimeout);
     searchTimeout = setTimeout(() => {
-        router.get(route("users.index", {
+        router.get(props.users.path, {
             search: newTerm
-        }));
-    }, 1000);
+        }, {
+            preserveState: true,
+            preserveScroll: true,
+        });
+    }, 500);
 });
 </script>
 
@@ -295,15 +298,15 @@ watch(searchTerm, (newTerm) => {
                 :default-page="users.current_page"
             >
                 <PaginationList v-slot="{ items }" class="flex items-center justify-center gap-1">
-                    <PaginationFirst @click="changePage('users.index', users.from)"/>
-                    <PaginationPrev @click="changePage('users.index', users.current_page - 1)"/>
+                    <PaginationFirst @click="changePage(users.path, users.from)"/>
+                    <PaginationPrev @click="changePage(users.path, users.current_page - 1)"/>
 
                     <template v-for="(item, index) in items">
                         <PaginationListItem v-if="item.type === 'page'" :key="index" :value="item.value" as-child>
                             <Button
                                 class="w-10 h-10 p-0"
                                 :variant="item.value === page ? 'default' : 'outline'"
-                                @click="changePage('users.index', item.value)"
+                                @click="changePage(users.path, item.value)"
                             >
                                 {{ item.value }}
                             </Button>
@@ -311,8 +314,8 @@ watch(searchTerm, (newTerm) => {
                         <PaginationEllipsis v-else :key="item.type" :index="index" />
                     </template>
 
-                    <PaginationNext @click="changePage('users.index', users.current_page + 1)"/>
-                    <PaginationLast @click="changePage('users.index', users.last_page)"/>
+                    <PaginationNext @click="changePage(users.path, users.current_page + 1)"/>
+                    <PaginationLast @click="changePage(users.path, users.last_page)"/>
                 </PaginationList>
             </Pagination>
         </div>

@@ -16,7 +16,7 @@ export function valueUpdater<T extends Updater<any>>(updaterOrValue: T, ref: Ref
 }
 
 export function changePage(routeName: string, newPage: number) {
-    router.get(route(routeName), { page: newPage }, {
+    router.get(routeName, { page: newPage }, {
         preserveState: true,
         preserveScroll: true,
     });

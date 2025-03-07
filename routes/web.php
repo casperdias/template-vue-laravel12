@@ -26,8 +26,8 @@ Route::middleware(['auth', 'verified', \Inertia\EncryptHistoryMiddleware::class]
             'permissions' => PermissionDataController::class,
         ]);
         Route::controller(RolePermissionController::class)->group(function () {
-            Route::get('roles/{id}/setting', 'index')->name('role.setting');
-            Route::post('roles/{id}/setting/{permissionId}', 'store')->name('role.setting.update');
+            Route::get('roles/{role}/setting', 'index')->name('role.setting');
+            Route::post('roles/{role}/setting/{permission}', 'store')->name('role.setting.update');
         });
     });
 });

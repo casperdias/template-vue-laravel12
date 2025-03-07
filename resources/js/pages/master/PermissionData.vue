@@ -27,7 +27,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 const { toast } = useToast()
 
-defineProps<Props>()
+const props = defineProps<Props>()
 
 interface Props {
     permissions : PaginationData<Permission>
@@ -124,10 +124,13 @@ let searchTimeout: ReturnType<typeof setTimeout>;
 watch(searchTerm, (newTerm) => {
     clearTimeout(searchTimeout);
     searchTimeout = setTimeout(() => {
-        router.get(route("permissions.index", {
+        router.get(props.permissions.path, {
             search: newTerm
-        }));
-    }, 1000);
+        }, {
+            preserveState: true,
+            preserveScroll: true,
+        });
+    }, 500);
 });
 </script>
 
@@ -190,7 +193,7 @@ watch(searchTerm, (newTerm) => {
                 :pagination="permissions"
                 :caption="'Permission Data'"
                 :actions="true"
-                routeName="permissions.index"
+                :routeName="permissions.path"
             >
                 <template #actions="{ item }">
                     <Button @click="openEditDialog(item)">Edit</Button>

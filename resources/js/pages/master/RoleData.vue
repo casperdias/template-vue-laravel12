@@ -27,7 +27,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 const { toast } = useToast()
 
-defineProps<Props>()
+const props = defineProps<Props>()
 
 interface Props {
     roles: PaginationData<Role>
@@ -145,10 +145,13 @@ let searchTimeout: ReturnType<typeof setTimeout>;
 watch(searchTerm, (newTerm) => {
     clearTimeout(searchTimeout);
     searchTimeout = setTimeout(() => {
-        router.get(route("roles.index", {
+        router.get(props.roles.path, {
             search: newTerm
-        }));
-    }, 1000);
+        }, {
+            preserveState: true,
+            preserveScroll: true,
+        });
+    }, 500);
 });
 </script>
 
@@ -210,7 +213,7 @@ watch(searchTerm, (newTerm) => {
                 :pagination="roles"
                 :caption="'Role Data'"
                 :actions="true"
-                routeName="roles.index"
+                :routeName="roles.path"
             >
                 <template #actions="{ item }">
                     <Button @click="openEditDialog(item)">Edit</Button>

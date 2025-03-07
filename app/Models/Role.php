@@ -18,4 +18,23 @@ class Role extends Model
     {
         return $this->hasMany(User::class);
     }
+
+    public function hasPermissionTo($permissionName)
+    {
+        return $this->permissions()->where('name', $permissionName)->exists();
+    }
+
+    public function givePermission(Permission $permission)
+    {
+        if (!$this->permissions()->where('permission_id', $permission->id)->exists()) {
+            $this->permissions()->attach($permission);
+        }
+    }
+
+    public function revokePermission(Permission $permission)
+    {
+        if ($this->permissions()->where('permission_id', $permission->id)->exists()) {
+            $this->permissions()->detach($permission);
+        }
+    }
 }
