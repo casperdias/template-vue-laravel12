@@ -17,7 +17,7 @@ class RoleDataController extends Controller
     public function index()
     {
         $page = request()->input('page', 1);
-        $per_page = request()->input('per_page', 1);
+        $per_page = request()->input('per_page', 5);
         $search = request()->input('search', '');
         $roles = Role::select('id', 'name', 'display_name', 'description')
             ->when($search, function ($query, $search) {

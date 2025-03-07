@@ -17,6 +17,9 @@ const mainNavItems: NavItem[] = [
         href: '/dashboard',
         icon: LayoutGrid,
     },
+];
+
+const adminNavItems: NavItem[] = [
     {
         title: 'Data Master',
         href: '/master-data',
@@ -38,8 +41,9 @@ const footerNavItems: NavItem[] = [
     },
 ];
 
-const filteredMainNavItems = mainNavItems.filter(item => !item.permission || permissions.includes(item.permission));
-const filteredFooterNavItems = footerNavItems.filter(item => !item.permission || permissions.includes(item.permission));
+function filterNavItems(items: NavItem[]): NavItem[] {
+    return items.filter(item => !item.permission || permissions.includes(item.permission));
+}
 </script>
 
 <template>
@@ -57,11 +61,12 @@ const filteredFooterNavItems = footerNavItems.filter(item => !item.permission ||
         </SidebarHeader>
 
         <SidebarContent>
-            <NavMain :items="filteredMainNavItems" />
+            <NavMain label="Platform" :items="filterNavItems(mainNavItems)"/>
+            <NavMain v-if="filterNavItems(adminNavItems).length > 0" label="Admin Navigation" :items="filterNavItems(adminNavItems)"/>
         </SidebarContent>
 
         <SidebarFooter>
-            <NavFooter :items="filteredFooterNavItems" />
+            <NavFooter :items="filterNavItems(footerNavItems)" />
             <NavUser />
         </SidebarFooter>
     </Sidebar>

@@ -60,7 +60,7 @@ defineProps({
         <TableCaption>{{ caption }}</TableCaption>
         <TableHeader>
             <TableRow>
-            <TableHead v-for="col in columns" :key="col.key" class="font-semibold text-black">{{ col.label }}</TableHead>
+            <TableHead v-for="col in columns" :key="col.key" class="font-semibold text-black dark:text-white">{{ col.label }}</TableHead>
             <TableHead v-if="actions" class="font-semibold text-black">Actions</TableHead>
             </TableRow>
         </TableHeader>

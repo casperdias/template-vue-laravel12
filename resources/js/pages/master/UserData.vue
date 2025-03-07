@@ -264,11 +264,11 @@ watch(searchTerm, (newTerm) => {
                 <TableCaption>Data User Aplikasi</TableCaption>
                 <TableHeader>
                     <TableRow>
-                        <TableHead>Nama</TableHead>
-                        <TableHead>Email</TableHead>
-                        <TableHead>Role</TableHead>
-                        <TableHead>Verifikasi Email</TableHead>
-                        <TableHead>Action</TableHead>
+                        <TableHead class="font-semibold text-black dark:text-white">Nama</TableHead>
+                        <TableHead class="font-semibold text-black dark:text-white">Email</TableHead>
+                        <TableHead class="font-semibold text-black dark:text-white">Role</TableHead>
+                        <TableHead class="font-semibold text-black dark:text-white">Verifikasi Email</TableHead>
+                        <TableHead class="font-semibold text-black dark:text-white">Action</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
