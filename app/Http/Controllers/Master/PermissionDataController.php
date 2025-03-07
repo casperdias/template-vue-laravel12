@@ -76,7 +76,7 @@ class PermissionDataController extends Controller
     public function update(Request $request, Permission $permission)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:' . Permission::class,
+            'name' => 'required|string|max:255|unique:' . Permission::class . ',name,' . $permission->id,
             'display_name' => 'required|string|max:255',
             'description' => 'required|string|max:255',
         ]);
