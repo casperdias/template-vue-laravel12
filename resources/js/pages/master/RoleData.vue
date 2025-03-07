@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import AppLayout from '@/layouts/AppLayout.vue';
 import { PaginationData, type BreadcrumbItem } from '@/types';
-import { Head, useForm, router } from '@inertiajs/vue3';
+import { Head, useForm, router, Link } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
@@ -182,6 +182,9 @@ const editRole = (roles: PaginationData<Role>) => {
                 <template #actions="{ item }">
                     <Button @click="openEditDialog(item)">Edit</Button>
                     <Button @click="openDeleteDialog(item)">Delete</Button>
+                    <Link :href="route('dashboard')">
+                        <Button>Atur Permission</Button>
+                    </Link>
                 </template>
             </TablePagination>
         </div>
