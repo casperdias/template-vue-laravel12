@@ -94,11 +94,11 @@ function toggleMenu(index: string) {
                     <SidebarMenu>
                         <template v-for="(item, index) in filterNavItems(items)" :key="item.title">
                             <Collapsible v-if="item.items" v-model="openMenus[index]">
-                                <CollapsibleTrigger class="group flex items-center justify-between w-full p-2 space-x-2 cursor-pointer hover:bg-sidebar-accent rounded-md" @click="toggleMenu(String(index))">
-                                    <div class="flex items-center space-x-2 text-sm">
+                                <CollapsibleTrigger class="group flex items-center justify-between w-full space-x-2 cursor-pointer hover:bg-sidebar-accent rounded-md" @click="toggleMenu(String(index))">
+                                    <SidebarMenuButton class="flex items-center text-sm">
                                         <component :is="item.icon" class="w-4 h-4" />
                                         <span class="flex-1">{{ item.title }}</span>
-                                    </div>
+                                    </SidebarMenuButton>
                                     <ChevronDown :class="{ 'rotate-180': openMenus[index] }" class="transition-transform w-4 h-4" />
                                 </CollapsibleTrigger>
                                 <CollapsibleContent>
