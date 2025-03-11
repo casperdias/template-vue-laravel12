@@ -10,14 +10,16 @@ export interface BreadcrumbItem {
     href: string;
 }
 
-export interface NavItem {
+type NavItemBase = {
     title: string;
-    href: string;
     icon?: LucideIcon;
     isActive?: boolean;
     permission?: string;
-    items?: NavItem[];
-}
+};
+
+export type NavItem =
+    | (NavItemBase & { href: string; items?: never })
+    | (NavItemBase & { items: NavItem[]; href?: never });
 
 export interface SharedData extends PageProps {
     name: string;

@@ -5,7 +5,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import { type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
-import { BookOpen, Calculator, Folder, GraduationCap, LayoutGrid, ChevronDown } from 'lucide-vue-next';
+import { BookOpen, FileCode, Folder, GraduationCap, LayoutGrid, ChevronDown, FileSpreadsheet } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 import { ref } from 'vue';
 
@@ -22,23 +22,22 @@ const navItems: { [key: string]: NavItem[] } = {
         },
         {
             title: 'Calculator',
-            href: '/test',
-            icon: Calculator,
+            icon: FileCode,
             items: [
                 {
                     title: 'DFI R-Series',
-                    href: '/test',
-                    icon: LayoutGrid,
+                    href: '/up',
+                    icon: FileSpreadsheet,
                 },
                 {
                     title: 'XN-Series Sysmex',
-                    href: '/test',
-                    icon: LayoutGrid,
+                    href: '/up',
+                    icon: FileSpreadsheet,
                 },
                 {
                     title: 'CN-Series Sysmex',
-                    href: '/test',
-                    icon: LayoutGrid,
+                    href: '/up',
+                    icon: FileSpreadsheet,
                 },
             ],
         }
@@ -105,8 +104,8 @@ function toggleMenu(index: string) {
                                 <CollapsibleContent>
                                     <SidebarMenu class="pl-6">
                                         <SidebarMenuItem v-for="subItem in item.items" :key="subItem.title">
-                                            <SidebarMenuButton as-child>
-                                                <Link :href="subItem.href">
+                                            <SidebarMenuButton as-child :is-active="page.url.startsWith(subItem.href || '')">
+                                                <Link :href="subItem.href || '#'">
                                                     <component :is="subItem.icon" class="w-4 h-4" />
                                                     {{ subItem.title }}
                                                 </Link>
@@ -116,7 +115,7 @@ function toggleMenu(index: string) {
                                 </CollapsibleContent>
                             </Collapsible>
                             <SidebarMenuItem v-else>
-                                <SidebarMenuButton as-child>
+                                <SidebarMenuButton as-child :is-active="page.url.startsWith(item.href)">
                                     <Link :href="item.href">
                                         <component :is="item.icon" class="w-5 h-5" />
                                         {{ item.title }}
