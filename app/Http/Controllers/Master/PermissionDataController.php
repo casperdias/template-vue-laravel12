@@ -5,9 +5,7 @@ namespace App\Http\Controllers\Master;
 use App\Http\Controllers\Controller;
 use App\Models\Permission;
 use Illuminate\Http\Request;
-
 use Inertia\Inertia;
-use Inertia\Response;
 
 class PermissionDataController extends Controller
 {
@@ -23,7 +21,7 @@ class PermissionDataController extends Controller
         $permissions = Permission::select('id', 'name', 'display_name', 'description')
             ->when($search, function ($query, $search) {
                 return $query->where('name', 'like', "%{$search}%")
-                            ->orWhere('display_name', 'like', "%{$search}%");
+                    ->orWhere('display_name', 'like', "%{$search}%");
             })
             ->orderBy('id', 'asc')
             ->paginate($per_page, ['*'], 'page', $page);
@@ -48,7 +46,7 @@ class PermissionDataController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:' . Permission::class,
+            'name' => 'required|string|max:255|unique:'.Permission::class,
             'display_name' => 'required|string|max:255',
             'description' => 'required|string|max:255',
         ]);
@@ -61,7 +59,7 @@ class PermissionDataController extends Controller
 
         return to_route('permissions.index', [
             'page' => request('page', 1),
-            'search' => request('search', '')
+            'search' => request('search', ''),
         ]);
     }
 
@@ -87,7 +85,7 @@ class PermissionDataController extends Controller
     public function update(Request $request, Permission $permission)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:' . Permission::class . ',name,' . $permission->id,
+            'name' => 'required|string|max:255|unique:'.Permission::class.',name,'.$permission->id,
             'display_name' => 'required|string|max:255',
             'description' => 'required|string|max:255',
         ]);
@@ -100,7 +98,7 @@ class PermissionDataController extends Controller
 
         return to_route('permissions.index', [
             'page' => request('page', 1),
-            'search' => request('search', '')
+            'search' => request('search', ''),
         ]);
     }
 
@@ -110,9 +108,10 @@ class PermissionDataController extends Controller
     public function destroy(Permission $permission)
     {
         $permission->delete();
+
         return to_route('permissions.index', [
             'page' => request('page', 1),
-            'search' => request('search', '')
+            'search' => request('search', ''),
         ]);
     }
 }

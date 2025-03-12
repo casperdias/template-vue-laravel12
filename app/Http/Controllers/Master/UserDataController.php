@@ -3,15 +3,13 @@
 namespace App\Http\Controllers\Master;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Auth\Events\Registered;
-use Inertia\Inertia;
-use Inertia\Response;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
-
-use App\Models\User;
-use App\Models\Role;
+use Inertia\Inertia;
 
 class UserDataController extends Controller
 {
@@ -24,18 +22,19 @@ class UserDataController extends Controller
         $per_page = request()->input('per_page', 5);
         $search = request()->input('search', '');
         $users = User::with('role:id,display_name')
-                ->select('id', 'name', 'email', 'created_at', 'email_verified_at', 'role_id')
-                ->when($search, function ($query, $search) {
-                    return $query->where('name', 'like', "%{$search}%")
-                                ->orWhere('email', 'like', "%{$search}%");
-                })
-                ->orderBy('id', 'asc')
-                ->paginate($per_page, ['*'], 'page', $page);
+            ->select('id', 'name', 'email', 'created_at', 'email_verified_at', 'role_id')
+            ->when($search, function ($query, $search) {
+                return $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            })
+            ->orderBy('id', 'asc')
+            ->paginate($per_page, ['*'], 'page', $page);
         $roles = Role::all()->pluck('display_name', 'id');
+
         return Inertia::render('master/UserData', [
             'users' => $users,
             'roles' => $roles,
-            'search' => $search
+            'search' => $search,
         ]);
     }
 
@@ -54,7 +53,7 @@ class UserDataController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|lowercase|email|max:255|unique:'. User::class,
+            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'role_id' => 'required|exists:roles,id',
             'password' => ['required', Rules\Password::defaults()],
         ]);
@@ -70,7 +69,7 @@ class UserDataController extends Controller
 
         return to_route('users.index', [
             'page' => request('page', 1),
-            'search' => request('search', '')
+            'search' => request('search', ''),
         ]);
     }
 
@@ -105,7 +104,7 @@ class UserDataController extends Controller
 
         return to_route('users.index', [
             'page' => request('page', 1),
-            'search' => request('search', '')
+            'search' => request('search', ''),
         ]);
     }
 
@@ -122,7 +121,7 @@ class UserDataController extends Controller
 
         return to_route('users.index', [
             'page' => request('page', 1),
-            'search' => request('search', '')
+            'search' => request('search', ''),
         ]);
     }
 }

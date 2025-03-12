@@ -3,13 +3,10 @@
 namespace App\Http\Controllers\Master;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-
-use App\Models\Role;
 use App\Models\Permission;
-
+use App\Models\Role;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Inertia\Response;
 
 class RolePermissionController extends Controller
 {
@@ -23,6 +20,7 @@ class RolePermissionController extends Controller
 
         $permissions->getCollection()->transform(function ($permission) use ($role) {
             $permission->status = $role->hasPermissionTo($permission->name);
+
             return $permission;
         });
 

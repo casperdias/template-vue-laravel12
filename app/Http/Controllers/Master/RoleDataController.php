@@ -5,9 +5,7 @@ namespace App\Http\Controllers\Master;
 use App\Http\Controllers\Controller;
 use App\Models\Role;
 use Illuminate\Http\Request;
-
 use Inertia\Inertia;
-use Inertia\Response;
 
 class RoleDataController extends Controller
 {
@@ -22,13 +20,14 @@ class RoleDataController extends Controller
         $roles = Role::select('id', 'name', 'display_name', 'description')
             ->when($search, function ($query, $search) {
                 return $query->where('name', 'like', "%{$search}%")
-                            ->orWhere('display_name', 'like', "%{$search}%");
+                    ->orWhere('display_name', 'like', "%{$search}%");
             })
             ->orderBy('id', 'asc')
             ->paginate($per_page, ['*'], 'page', $page);
+
         return Inertia::render('master/RoleData', [
             'roles' => $roles,
-            'search' => $search
+            'search' => $search,
         ]);
     }
 
@@ -46,7 +45,7 @@ class RoleDataController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:' . Role::class,
+            'name' => 'required|string|max:255|unique:'.Role::class,
             'display_name' => 'required|string|max:255',
             'description' => 'required|string|max:255',
         ]);
@@ -59,7 +58,7 @@ class RoleDataController extends Controller
 
         return to_route('roles.index', [
             'page' => request('page', 1),
-            'search' => request('search', '')
+            'search' => request('search', ''),
         ]);
     }
 
@@ -85,7 +84,7 @@ class RoleDataController extends Controller
     public function update(Request $request, Role $role)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:' . Role::class . ',name,' . $role->id,
+            'name' => 'required|string|max:255|unique:'.Role::class.',name,'.$role->id,
             'display_name' => 'required|string|max:255',
             'description' => 'required|string|max:255',
         ]);
@@ -98,7 +97,7 @@ class RoleDataController extends Controller
 
         return to_route('roles.index', [
             'page' => request('page', 1),
-            'search' => request('search', '')
+            'search' => request('search', ''),
         ]);
     }
 
@@ -108,9 +107,10 @@ class RoleDataController extends Controller
     public function destroy(Role $role)
     {
         $role->delete();
+
         return to_route('roles.index', [
             'page' => request('page', 1),
-            'search' => request('search', '')
+            'search' => request('search', ''),
         ]);
     }
 }

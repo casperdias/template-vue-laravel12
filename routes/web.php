@@ -1,13 +1,12 @@
 <?php
 
+use App\Http\Controllers\Master\MasterController;
+use App\Http\Controllers\Master\PermissionDataController;
+use App\Http\Controllers\Master\RoleDataController;
+use App\Http\Controllers\Master\RolePermissionController;
+use App\Http\Controllers\Master\UserDataController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-
-use App\Http\Controllers\Master\MasterController;
-use App\Http\Controllers\Master\UserDataController;
-use App\Http\Controllers\Master\RoleDataController;
-use App\Http\Controllers\Master\PermissionDataController;
-use App\Http\Controllers\Master\RolePermissionController;
 
 Route::get('/', function () {
     return redirect()->route('dashboard');

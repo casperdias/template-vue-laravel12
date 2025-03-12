@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Role extends Model
 {
     protected $table = 'roles';
+
     protected $fillable = ['name', 'display_name', 'description'];
 
     public function permissions()
@@ -26,7 +27,7 @@ class Role extends Model
 
     public function givePermission(Permission $permission)
     {
-        if (!$this->permissions()->where('permission_id', $permission->id)->exists()) {
+        if (! $this->permissions()->where('permission_id', $permission->id)->exists()) {
             $this->permissions()->attach($permission);
         }
     }

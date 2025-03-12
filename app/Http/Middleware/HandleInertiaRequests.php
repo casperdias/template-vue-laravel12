@@ -55,10 +55,10 @@ class HandleInertiaRequests extends Middleware
             'name' => config('app.name'),
             'quote' => [
                 'message' => trim($message),
-                'author' => trim($author)
+                'author' => trim($author),
             ],
             'auth' => [
-                'user' => $userData
+                'user' => $userData,
             ],
         ];
     }
