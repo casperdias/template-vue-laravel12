@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import NavFooter from '@/components/NavFooter.vue';
 import NavUser from '@/components/NavUser.vue';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import { type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
-import { BookOpen, FileCode, Folder, GraduationCap, LayoutGrid, ChevronDown, FileSpreadsheet } from 'lucide-vue-next';
-import AppLogo from './AppLogo.vue';
+import { BookOpen, ChevronDown, FileCode, FileSpreadsheet, Folder, GraduationCap, LayoutGrid } from 'lucide-vue-next';
 import { ref } from 'vue';
+import AppLogo from './AppLogo.vue';
 
 const page = usePage<SharedData>();
 const permissions = page.props.auth.user.permissions;
@@ -40,7 +40,7 @@ const navItems: { [key: string]: NavItem[] } = {
                     icon: FileSpreadsheet,
                 },
             ],
-        }
+        },
     ],
     admin: [
         {
@@ -65,7 +65,7 @@ const navItems: { [key: string]: NavItem[] } = {
 };
 
 function filterNavItems(items: NavItem[]): NavItem[] {
-    return items.filter(item => !item.permission || permissions.includes(item.permission));
+    return items.filter((item) => !item.permission || permissions.includes(item.permission));
 }
 
 function toggleMenu(index: string) {
@@ -94,19 +94,22 @@ function toggleMenu(index: string) {
                     <SidebarMenu>
                         <template v-for="(item, index) in filterNavItems(items)" :key="item.title">
                             <Collapsible v-if="item.items" v-model="openMenus[index]">
-                                <CollapsibleTrigger class="group flex items-center justify-between w-full cursor-pointer hover:bg-sidebar-accent rounded-md" @click="toggleMenu(String(index))">
+                                <CollapsibleTrigger
+                                    class="group flex w-full cursor-pointer items-center justify-between rounded-md hover:bg-sidebar-accent"
+                                    @click="toggleMenu(String(index))"
+                                >
                                     <SidebarMenuButton class="flex items-center text-sm">
-                                        <component :is="item.icon" class="w-4 h-4" />
+                                        <component :is="item.icon" class="h-4 w-4" />
                                         <span class="flex-1">{{ item.title }}</span>
                                     </SidebarMenuButton>
-                                    <ChevronDown :class="{ 'rotate-180': openMenus[index] }" class="transition-transform w-4 h-4" />
+                                    <ChevronDown :class="{ 'rotate-180': openMenus[index] }" class="h-4 w-4 transition-transform" />
                                 </CollapsibleTrigger>
                                 <CollapsibleContent>
                                     <SidebarMenu class="pl-6">
                                         <SidebarMenuItem v-for="subItem in item.items" :key="subItem.title">
                                             <SidebarMenuButton as-child :is-active="page.url.startsWith(subItem.href || '')">
                                                 <Link :href="subItem.href || '#'">
-                                                    <component :is="subItem.icon" class="w-4 h-4" />
+                                                    <component :is="subItem.icon" class="h-4 w-4" />
                                                     {{ subItem.title }}
                                                 </Link>
                                             </SidebarMenuButton>
@@ -117,7 +120,7 @@ function toggleMenu(index: string) {
                             <SidebarMenuItem v-else>
                                 <SidebarMenuButton as-child :is-active="page.url.startsWith(item.href)">
                                     <Link :href="item.href">
-                                        <component :is="item.icon" class="w-5 h-5" />
+                                        <component :is="item.icon" class="h-5 w-5" />
                                         {{ item.title }}
                                     </Link>
                                 </SidebarMenuButton>

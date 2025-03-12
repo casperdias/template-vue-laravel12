@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
-import { router } from '@inertiajs/vue3';
+import TablePagination from '@/components/TablePagination.vue';
+import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { PaginationData, type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import { Search } from 'lucide-vue-next';
-import { Input } from '@/components/ui/input';
-import TablePagination from '@/components/TablePagination.vue';
-import { Switch } from '@/components/ui/switch';
+import { ref, watch } from 'vue';
 
 const props = defineProps<{
     role: Role;
@@ -41,44 +40,58 @@ const breadcrumbs: BreadcrumbItem[] = [
         title: `${props.role.display_name}`,
         href: `/master-data/roles/${props.role.id}/setting`,
     },
-]
+];
 
-const searchTerm = ref(route().params.search || "");
+const searchTerm = ref(route().params.search || '');
 let searchTimeout: ReturnType<typeof setTimeout>;
 
 watch(searchTerm, (newTerm) => {
     clearTimeout(searchTimeout);
     searchTimeout = setTimeout(() => {
-        router.get(props.permissions.path, {
-            search: newTerm,
-        }, {
-            preserveState: true,
-            preserveScroll: true,
-        });
+        router.get(
+            props.permissions.path,
+            {
+                search: newTerm,
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
     }, 500);
 });
 
 const setupPermissionWatchers = () => {
     props.permissions.data.forEach((permission) => {
-        watch(() => permission.status, (newStatus) => {
-            router.post(`${props.permissions.path}/${permission.id}`, {
-                status: newStatus,
-                page: props.permissions.current_page,
-                search: searchTerm.value,
-            }, {
-                preserveState: true,
-                preserveScroll: true,
-            });
-        });
+        watch(
+            () => permission.status,
+            (newStatus) => {
+                router.post(
+                    `${props.permissions.path}/${permission.id}`,
+                    {
+                        status: newStatus,
+                        page: props.permissions.current_page,
+                        search: searchTerm.value,
+                    },
+                    {
+                        preserveState: true,
+                        preserveScroll: true,
+                    },
+                );
+            },
+        );
     });
 };
 
 setupPermissionWatchers();
 
-watch(() => props.permissions.data, () => {
-    setupPermissionWatchers();
-}, { deep: true });
-
+watch(
+    () => props.permissions.data,
+    () => {
+        setupPermissionWatchers();
+    },
+    { deep: true },
+);
 </script>
 
 <template>
@@ -88,7 +101,7 @@ watch(() => props.permissions.data, () => {
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <div class="relative w-full max-w-sm items-center">
                 <Input id="search" type="text" name="search" placeholder="Search..." class="pl-10" v-model="searchTerm" />
-                <span class="absolute start-0 inset-y-0 flex items-center justify-center px-2">
+                <span class="absolute inset-y-0 start-0 flex items-center justify-center px-2">
                     <Search class="size-6 text-muted-foreground" />
                 </span>
             </div>

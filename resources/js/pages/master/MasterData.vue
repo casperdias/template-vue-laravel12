@@ -1,24 +1,17 @@
 <script setup lang="ts">
-import AppLayout from '@/layouts/AppLayout.vue'
-import { type BreadcrumbItem } from '@/types'
-import { Head, Link } from '@inertiajs/vue3'
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { User, UserCog, ShieldPlus, Eye } from 'lucide-vue-next'
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import AppLayout from '@/layouts/AppLayout.vue';
+import { type BreadcrumbItem } from '@/types';
+import { Head, Link } from '@inertiajs/vue3';
+import { Eye, ShieldPlus, User, UserCog } from 'lucide-vue-next';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Master',
         href: '/master-data',
     },
-]
+];
 
 const cards = [
     {
@@ -26,31 +19,23 @@ const cards = [
         description: 'CRUD User dan Role User',
         icon: User,
         url: '/master-data/users',
-        list: [
-            'CRUD User',
-            'Pengaturan Role User',
-        ],
+        list: ['CRUD User', 'Pengaturan Role User'],
     },
     {
         title: 'Role',
         description: 'CRUD Role dan Permission Role',
         icon: UserCog,
         url: '/master-data/roles',
-        list: [
-            'CRUD Role',
-            'Pengaturan Permission Role',
-        ],
+        list: ['CRUD Role', 'Pengaturan Permission Role'],
     },
     {
         title: 'Permission',
         description: 'CRUD Permission',
         icon: ShieldPlus,
         url: '/master-data/permissions',
-        list: [
-            'CRUD Permission',
-        ],
+        list: ['CRUD Permission'],
     },
-]
+];
 </script>
 
 <template>
@@ -69,8 +54,8 @@ const cards = [
                         <CardDescription>{{ card.description }}</CardDescription>
                     </CardHeader>
                     <CardContent class="flex items-center space-x-3">
-                        <component :is="card.icon" class="w-20 h-20 text-primary-500" />
-                        <ul class="list-disc pl-5 flex flex-col gap-2">
+                        <component :is="card.icon" class="text-primary-500 h-20 w-20" />
+                        <ul class="flex list-disc flex-col gap-2 pl-5">
                             <li v-for="(item, index) in card.list" :key="index" class="text-sm font-bold">
                                 {{ item }}
                             </li>
@@ -79,7 +64,7 @@ const cards = [
                     <CardFooter>
                         <Link class="w-full" :href="card.url">
                             <Button class="w-full" variant="default">
-                                <Eye class="w-6 h-6 ml-2" />
+                                <Eye class="ml-2 h-6 w-6" />
                                 Lihat Data
                             </Button>
                         </Link>

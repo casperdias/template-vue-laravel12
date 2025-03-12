@@ -1,13 +1,5 @@
 <script setup lang="ts">
-import {
-    Table,
-    TableBody,
-    TableCaption,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
 import {
     Pagination,
     PaginationEllipsis,
@@ -18,7 +10,7 @@ import {
     PaginationNext,
     PaginationPrev,
 } from '@/components/ui/pagination';
-import { Button } from '@/components/ui/button';
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { changePage } from '@/lib/helper';
 
 defineProps({
@@ -60,16 +52,16 @@ defineProps({
         <TableCaption>{{ caption }}</TableCaption>
         <TableHeader>
             <TableRow>
-            <TableHead v-for="col in columns" :key="col.key" class="font-semibold text-black dark:text-white">{{ col.label }}</TableHead>
-            <TableHead v-if="actions" class="font-semibold text-black">Actions</TableHead>
+                <TableHead v-for="col in columns" :key="col.key" class="font-semibold text-black dark:text-white">{{ col.label }}</TableHead>
+                <TableHead v-if="actions" class="font-semibold text-black">Actions</TableHead>
             </TableRow>
         </TableHeader>
         <TableBody>
             <TableRow v-for="item in data" :key="item.id">
-            <TableCell v-for="col in columns" :key="col.key">{{ item[col.key] }}</TableCell>
-            <TableCell v-if="actions" class="space-x-2">
-                <slot name="actions" :item="item"></slot>
-            </TableCell>
+                <TableCell v-for="col in columns" :key="col.key">{{ item[col.key] }}</TableCell>
+                <TableCell v-if="actions" class="space-x-2">
+                    <slot name="actions" :item="item"></slot>
+                </TableCell>
             </TableRow>
         </TableBody>
     </Table>
@@ -81,7 +73,9 @@ defineProps({
 
             <template v-for="(item, index) in items">
                 <PaginationListItem v-if="item.type === 'page'" :key="index" :value="item.value" as-child>
-                    <Button :variant="item.value === page ? 'default' : 'outline'" @click="changePage(routeName, item.value)">{{ item.value }}</Button>
+                    <Button :variant="item.value === page ? 'default' : 'outline'" @click="changePage(routeName, item.value)">{{
+                        item.value
+                    }}</Button>
                 </PaginationListItem>
                 <PaginationEllipsis v-else :key="item.type" :index="index" />
             </template>

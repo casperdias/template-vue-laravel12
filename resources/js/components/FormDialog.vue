@@ -26,40 +26,40 @@
 </template>
 
 <script setup lang="ts">
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { LoaderCircle } from 'lucide-vue-next'
-import { PropType, ref, watch } from 'vue'
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { LoaderCircle } from 'lucide-vue-next';
+import { PropType, ref, watch } from 'vue';
 
 const props = defineProps({
     open: {
         type: Boolean,
-        required: true
+        required: true,
     },
     title: {
         type: String,
-        required: true
+        required: true,
     },
     description: {
         type: String,
-        required: true
+        required: true,
     },
     submitText: {
         type: String,
-        required: true
+        required: true,
     },
     processing: {
         type: Boolean,
-        required: true
+        required: true,
     },
     onSubmit: {
         type: Function as PropType<() => void>,
-        required: true
+        required: true,
     },
     trigger: {
         type: Boolean,
-        default: false
-    }
+        default: false,
+    },
 });
 
 const emit = defineEmits(['update:open']);
@@ -70,7 +70,10 @@ watch(localOpen, (newVal) => {
     emit('update:open', newVal);
 });
 
-watch(() => props.open, (newVal) => {
-    localOpen.value = newVal;
-});
+watch(
+    () => props.open,
+    (newVal) => {
+        localOpen.value = newVal;
+    },
+);
 </script>

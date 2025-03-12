@@ -62,7 +62,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 const page = usePage<SharedData>();
 const user = page.props.auth.user as User;
-
 </script>
 
 <template>
@@ -76,7 +75,7 @@ const user = page.props.auth.user as User;
                         :href="route('verification.send')"
                         method="post"
                         as="button"
-                        class="hover:!decoration-current text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out dark:decoration-neutral-500"
+                        class="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:!decoration-current dark:decoration-neutral-500"
                     >
                         Click here to resend the verification email.
                     </Link>
@@ -103,14 +102,21 @@ const user = page.props.auth.user as User;
                                 <DialogHeader class="space-y-3">
                                     <DialogTitle>Are you sure you want to delete your account?</DialogTitle>
                                     <DialogDescription>
-                                        Once your account is deleted, all of its resources and data will also be permanently deleted. Please enter your
-                                        password to confirm you would like to permanently delete your account.
+                                        Once your account is deleted, all of its resources and data will also be permanently deleted. Please enter
+                                        your password to confirm you would like to permanently delete your account.
                                     </DialogDescription>
                                 </DialogHeader>
 
                                 <div class="grid gap-2">
                                     <Label for="password" class="sr-only">Password</Label>
-                                    <Input id="password" type="password" name="password" ref="passwordInput" v-model="form.password" placeholder="Password" />
+                                    <Input
+                                        id="password"
+                                        type="password"
+                                        name="password"
+                                        ref="passwordInput"
+                                        v-model="form.password"
+                                        placeholder="Password"
+                                    />
                                     <InputError :message="form.errors.password" />
                                 </div>
 

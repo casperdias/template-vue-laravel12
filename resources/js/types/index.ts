@@ -17,9 +17,7 @@ type NavItemBase = {
     permission?: string;
 };
 
-export type NavItem =
-    | (NavItemBase & { href: string; items?: never })
-    | (NavItemBase & { items: NavItem[]; href?: never });
+export type NavItem = (NavItemBase & { href: string; items?: never }) | (NavItemBase & { items: NavItem[]; href?: never });
 
 export interface SharedData extends PageProps {
     name: string;
@@ -40,7 +38,7 @@ export interface User {
         id: number;
         display_name: string;
     };
-    permissions: string[]
+    permissions: string[];
 }
 
 export interface PaginationData<T> {
