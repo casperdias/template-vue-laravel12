@@ -37,7 +37,7 @@ const currentPath = window.location.pathname;
                         :class="['w-full justify-start', { 'bg-muted': currentPath === item.href }]"
                         as-child
                     >
-                        <Link :href="item.href">
+                        <Link :href="item.href || '#'">
                             {{ item.title }}
                         </Link>
                     </Button>
